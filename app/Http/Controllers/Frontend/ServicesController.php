@@ -4221,6 +4221,22 @@ private function konsinyeKullan($stokId, $adet, $servisId, $planId, $tenantId)
             }
         }
 
+        // Fiş notlarını yapılan işlemlerin sonuna ekle
+        $fisNotlari = ServiceReceiptNote::where('servisid', $servisId)
+            ->where('firma_id', $tenantId)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($fisNotlari->count() > 0) {
+            if (!empty($islemler)) {
+                $islemler .= "\r\n"; // Boşluk bırak
+            }
+            
+            foreach ($fisNotlari as $not) {
+                $islemler .= $not->aciklama . "\r\n";
+            }
+        }
+
         return $islemler;
     }
 

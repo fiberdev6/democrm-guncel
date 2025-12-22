@@ -4,8 +4,8 @@
     <div class="row mb-1 align-items-center">
         <label class="col-sm-3 custom-p-r">Markalar<span class="text-danger">*</span></label>
         <div class="col-sm-9 custom-p-l">
-            <div class="input-group">
-                <select name="marka_id" class="form-select" required>
+            <div class="input-group input-group-sm">
+                <select name="marka_id" class="form-select form-select-sm" required>
                     <option value="" selected disabled>- Marka arayın veya seçin -</option>
                     @if(old('marka_id'))
                         @php
@@ -16,7 +16,7 @@
                         @endif
                     @endif
                 </select>
-                <button class="btn btn-success" type="button" id="addNewBrandBtn">+</button>
+                <button class="btn btn-success btn-sm" type="button" id="addNewBrandBtn">+</button>
             </div>
         </div>
     </div>
@@ -24,8 +24,8 @@
     <div class="row mb-1 align-items-center">
         <label class="col-sm-3 custom-p-r">Cihaz Türleri<span class="text-danger">*</span></label>
         <div class="col-sm-9 custom-p-l">
-            <div class="input-group">
-                <select name="cihaz_id" class="form-select" required>
+            <div class="input-group input-group-sm">
+                <select name="cihaz_id" class="form-select form-select-sm" required>
                     <option value="" selected disabled>- Cihaz türü arayın veya seçin -</option>
                      @if(old('cihaz_id'))
                         @php
@@ -36,7 +36,7 @@
                         @endif
                     @endif
                 </select>
-                <button class="btn btn-success" type="button" id="addNewDeviceTypeBtn">+</button>
+                <button class="btn btn-success btn-sm" type="button" id="addNewDeviceTypeBtn">+</button>
             </div>
         </div>
     </div>
@@ -44,8 +44,8 @@
     <div class="row mb-1 align-items-center">
         <label class="col-sm-3 custom-p-r">Raf Seç<span class="text-danger">*</span></label>
         <div class="col-sm-9 custom-p-l">
-            <div class="input-group">
-                <select name="raf_id" class="form-select" required>
+            <div class="input-group input-group-sm" >
+                <select name="raf_id" class="form-select form-select-sm"  required>
                     <option value="" selected disabled>- Raf arayın veya seçin -</option>
                      @if(old('raf_id'))
                         @php
@@ -56,7 +56,7 @@
                         @endif
                     @endif
                 </select>
-                <button class="btn btn-success" type="button" id="addNewShelfBtn">+</button>
+                <button class="btn btn-success btn-sm" type="button" id="addNewShelfBtn">+</button>
             </div>
         </div>
     </div>
@@ -594,16 +594,39 @@ $(document).ready(function () {
 $(document).ready(function() {
     let isSubmitting = false;
     let shouldReload = false;
+    let closingSubModal = false; // Alt modal kapatılıyor mu kontrolü
     
     // Form submit edildiğinde flag'i ayarla
     $('#addConsignmentDevice').submit(function() {
         isSubmitting = true;
     });
     
-    // Modal kapatılmaya çalışıldığında
+    // Alt modallar kapatılmadan önce flag'i işaretle
+    $('#addBrandModal, #addDeviceTypeModal, #addShelfModal').on('hide.bs.modal', function(e) {
+        closingSubModal = true;
+    });
+    
+    // Alt modallar kapandıktan sonra flag'i sıfırla
+    $('#addBrandModal, #addDeviceTypeModal, #addShelfModal').on('hidden.bs.modal', function(e) {
+        closingSubModal = false;
+        
+        // Ana modal açıksa body'ye modal-open sınıfını geri ekle
+        if ($('#addConsignmentModal').hasClass('show')) {
+            $('body').addClass('modal-open');
+        }
+    });
+    
+    // ANA MODAL kapatılmaya çalışıldığında
     $('#addConsignmentModal').on('hide.bs.modal', function(e) {
+        // Eğer alt modal kapatılıyorsa, ana modalı etkileme
+        if (closingSubModal) {
+            return;
+        }
+        
+        // Form submit edildiyse direkt kapat
         if (isSubmitting) {
             isSubmitting = false;
+            shouldReload = true;
             return true;
         }
         
@@ -618,8 +641,13 @@ $(document).ready(function() {
         isSubmitting = false;
     });
     
-    // Modal tamamen kapandığında sayfayı yenile
+    // ANA MODAL tamamen kapandığında sayfayı yenile
     $('#addConsignmentModal').on('hidden.bs.modal', function() {
+        // Eğer alt modal kapatılıyorsa sayfa yenileme
+        if (closingSubModal) {
+            return;
+        }
+        
         isSubmitting = false;
         if (shouldReload) {
             shouldReload = false;

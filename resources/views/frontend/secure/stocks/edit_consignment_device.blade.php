@@ -325,7 +325,7 @@
                     <div id="tedarikciSelectDiv" class="row mb-3">
                         <label class="col-sm-4 col-4 col-form-label">Tedarikçi</label>
                         <div class="col-sm-8 col-8">
-                            <div class="input-group">
+                            <div class="input-group input-group-sm">
                                 <!-- Select2 için güncellenmiş select -->
                                 <select name="tedarikci" id="tedarikciSelect" class="form-control select2-ajax"
                                     data-url="/{{ $firma->id }}/search-suppliers">
@@ -334,8 +334,8 @@
                                         <option value="{{ $tedarikci->id }}">{{ $tedarikci->tedarikci }}</option>
                                     @endforeach
                                 </select>
-                                <button class="btn btn-success d-flex align-items-center justify-content-center"
-                                    type="button" id="addNewSupplierBtn" style="min-width: 32px; height:28px;">
+                                <button class="btn btn-success btn-sm d-flex align-items-center justify-content-center"
+                                    type="button" id="addNewSupplierBtn" >
                                     +
                                 </button>
                             </div>
@@ -359,8 +359,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
                 </div>
             </div>
         </form>
