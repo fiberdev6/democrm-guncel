@@ -908,6 +908,10 @@ Route::controller(HomeController::class)->group(function() {
     Route::get('/sifre-sifirla/{token}', 'showResetPasswordForm')->name('password.reset');
     Route::post('/sifre-sifirla', 'resetPassword')->name('password.update');
 
+    // İl ve İlçe listeleme route'ları
+    Route::get('/get-cities', 'getCities')->name('get.cities');
+    Route::get('/get-districts', 'getDistricts')->name('get.districts');
+
 });
 
 Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','checkTenantId','check.subscription','redirect_after_login','check.tenant.status']], function () {

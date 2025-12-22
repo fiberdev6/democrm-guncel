@@ -45,17 +45,25 @@ class SubscriptionController extends Controller
         'remainingTrialDays'));
     }
 
-    public function subscriptionPlans($tenant_id) {
-    $tenant = Tenant::findOrFail($tenant_id);
-    $currentPlan = $tenant->plan();
-    
-    // Sadece mevcut plandan daha yüksek fiyatlı planları göster
-    $plans = SubscriptionPlan::where('is_active', true)
+    public function subscriptionPlans($tenant_id, Request $request) {
+        $tenant = Tenant::findOrFail($tenant_id);
+        $currentPlan = $tenant->plan();
+        
+        $allPlans = SubscriptionPlan::where('is_active', true)
                             ->where('price', '>', $currentPlan?->price ?? 0)
                             ->orderBy('price', 'asc')
                             ->get();
+    
+    // Eğer belirli bir feature için filtreleme isteniyorsa
+    if ($request->has('feature')) {
+        $plans = $allPlans->filter(function($plan) use ($request) {
+            return $plan->hasFeature($request->feature);
+        });
+    } else {
+        $plans = $allPlans;
+    }
 
-        return view('frontend.secure.subscription.all_plans', compact('plans','tenant','currentPlan'));
+            return view('frontend.secure.subscription.all_plans', compact('plans','tenant','currentPlan'));
     }
 
     /**

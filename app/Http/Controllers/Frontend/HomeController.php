@@ -762,6 +762,11 @@ public function selectPlan($planIndex)
             
         } elseif ($step == 2) {
             // Step 2: Personal information validation
+            if ($request->has('vergiNo')) {
+                $request->merge([
+                    'vergiNo' => preg_replace('/\D/', '', $request->vergiNo),
+                ]);
+            }
             $validatedData = $request->validate([
                 'subscription_plan' => 'required|exists:subscription_plans,id',
                 'name' => 'required|string|max:255',
@@ -789,6 +794,10 @@ public function selectPlan($planIndex)
             
         } elseif ($step == 3) {
             // Step 3: Company information and password validation
+            $request->merge([
+                'tel' => preg_replace('/\D/', '', $request->tel),
+                'vergiNo' => preg_replace('/\D/', '', $request->vergiNo),
+            ]);
             $validatedData = $request->validate([
                 'subscription_plan' => 'required|exists:subscription_plans,id',
                 'name' => 'required|string|max:255',
@@ -796,7 +805,9 @@ public function selectPlan($planIndex)
                 'email' => 'required|email|max:255|unique:tenants,eposta',
                 'vergiNo' => 'required|max:10|unique:tenants,vergiNo',
                 'firma_adi' => 'required|string|max:50',
-                'tel' => 'required|regex:/^[0-9\s]+$/|min:12|unique:tenants,tel1',
+                'il_id' => 'required|exists:ils,id',
+                'ilce_id' => 'required|exists:ilces,id',
+                'tel' => 'required|digits_between:10,11|unique:tenants,tel1',
                 'password' => 'required|min:6|confirmed',
             ], [
                 'subscription_plan.required' => 'Lütfen bir abonelik planı seçiniz.',
@@ -817,9 +828,13 @@ public function selectPlan($planIndex)
                 'vergiNo.unique' => 'Bu vergi numarası zaten kayıtlı.',
                 'firma_adi.required' => 'Firma Adı alanı zorunludur.',
                 'firma_adi.max' => 'Firma Adı alanı en fazla 50 karakter olmalıdır.',
+                'il_id.required' => 'İl seçimi zorunludur.',
+                'il_id.exists' => 'Geçersiz il seçimi.',
+                'ilce_id.required' => 'İlçe seçimi zorunludur.',
+                'ilce_id.exists' => 'Geçersiz ilçe seçimi.',
                 'tel.required' => 'Telefon alanı zorunludur.',
                 'tel.regex' => 'Telefon formatı hatalıdır.',
-                'tel.min' => 'Telefon numarası en az 10 haneli olmalıdır.',
+                'tel.min' => 'Telefon numarası en az 10-11 haneli olmalıdır.',
                 'tel.unique' => 'Bu telefon numarası zaten kayıtlı.',
                 'password.required' => 'Şifre alanı zorunludur.',
                 'password.min' => 'Şifre en az 6 karakter olmalıdır.',
@@ -854,7 +869,9 @@ public function RegisterAction(Request $request)
         'subscription_plan' => 'required|exists:subscription_plans,id',
         'name' => 'required|string|max:255',
         'username' => 'required|string|min:3|max:50|unique:tb_user,username|regex:/^[a-zA-Z0-9_]+$/',
-        'firma_adi' => 'required|string|max:50',
+        'firma_adi' => 'required|string|max:50|regex:/^[a-zA-ZğüşıöçĞÜŞİÖÇ0-9\s]+$/',
+        'il_id' => 'required|exists:ils,id',
+        'ilce_id' => 'required|exists:ilces,id',
         'vergiNo' => 'required|digits:10|unique:tenants,vergiNo',
         'tel' => 'required|digits_between:10,11|unique:tenants,tel1',
         'email' => 'required|email|max:255|unique:tenants,eposta',
@@ -871,6 +888,11 @@ public function RegisterAction(Request $request)
         'username.regex' => 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir.',
         'firma_adi.required' => 'Firma Adı alanı zorunludur.',
         'firma_adi.max' => 'Firma Adı alanı en fazla 50 karakter olmalıdır.',
+        'firma_adi.regex' => 'Firma adı sadece harf, rakam ve boşluk içerebilir. Noktalama işaretleri kullanılamaz.',
+        'il_id.required' => 'İl seçimi zorunludur.',
+        'il_id.exists' => 'Geçersiz il seçimi.',
+        'ilce_id.required' => 'İlçe seçimi zorunludur.',
+        'ilce_id.exists' => 'Geçersiz ilçe seçimi.',
         'vergiNo.required' => 'Vergi numarası alanı zorunludur.',
         'vergiNo.digits' => 'Vergi numarası 10 haneli olmalıdır.',
         'vergiNo.unique' => 'Bu vergi numarası zaten kayıtlı.',
@@ -1098,7 +1120,7 @@ public function RegisterAction(Request $request)
         // KAYIT BAŞARILI SMS GÖNDER (Firma kodunu dahil et)
         try {
             $smsService = new TescomService();
-            $smsMessage = "Serbis ailesine hoşgeldiniz.\n\nFirma Kodunuz: {$firmaKodu}\n\nBu kodu giriş yaparken kullanacaksınız. Lütfen bir yere not ediniz.\n\nDemo talebiniz alınmıştır. Hesap bilgileriniz e-posta adresinize gönderilecektir.";
+            $smsMessage = "Serbis ailesine hoşgeldiniz.\n\nDemo talebiniz alınmıştır. Hesap bilgileriniz e-posta adresinize gönderilecektir.";
             $smsResult = $smsService->sendSms($registrationData['tel'], $smsMessage);
             
             Log::info('Kayıt Başarı SMS\'i Gönderildi', [
@@ -1267,6 +1289,8 @@ public function resendSmsCode(Request $request)
         'firma_kodu' => $firmaKodu, // Yeni firma kodu
         'vergiNo' => $data['vergiNo'],
         'firma_slug' => $firmaAdiSlug,
+        'il' => $data['il_id'],
+        'ilce' => $data['ilce_id'],
         'tel1' => $data['tel'],
         'eposta' => $data['email'],
         'username' => $tenantUsername,
@@ -1315,11 +1339,79 @@ public function resendSmsCode(Request $request)
         'created_at' => Carbon::now(),
     ]);
 
+    // Varsayılan Fiş Tasarımı Oluştur
+$defaultReceiptDesign = "[FIRMAADI]
+TEL : [TEL]-[TEL2]
+ADRES : [ADRES]
+--------------------------------
+BEYAZ ESYA - KLIMA - KOMBI - TV
+================================
+- MUSTERI BILGISI - 
+--------------------------------
+[MUSTERIBILGILERI]
+================================
+- CIHAZ BILGISI - 
+--------------------------------
+[CIHAZBILGILERI]
+================================
+- YAPILAN ISLEMLER - 
+--------------------------------
+[YAPILANISLEMLER]
+================================
+- KASA HAREKETLERI - 
+--------------------------------
+[KASAHAREKETLERI]
+================================
+- TEKNISYEN ADI VE IMZASI - 
+--------------------------------
+[TEKNISYENADI]
+TARIH : [TARIHSAAT]
+================================
+- MUSTERI ADI VE IMZASI - 
+--------------------------------
+[MUSTERIADI]
+TARIH : [TARIHSAAT]
+================================";
+
+ReceiptDesign::create([
+    'firma_id' => $tenant_id,
+    'fisTasarimi' => $defaultReceiptDesign,
+    'boyut' => 58,
+    'created_at' => Carbon::now(),
+]);
+
     // Session'dan firma kodunu kaydet
     session(['firma_kodu' => $firmaKodu]);
     session()->forget('selected_plan');
     
     return $tenant;
+}
+
+public function getCities()
+{
+    $cities = DB::table('ils')->orderBy('name', 'asc')->get(['id', 'name']);
+    
+    return response()->json([
+        'success' => true,
+        'cities' => $cities
+    ]);
+}
+
+/**
+ * Seçilen ile ait ilçeleri getir
+ */
+public function getDistricts(Request $request)
+{
+    $ilId = $request->input('il_id');
+    
+    $districts = DB::table('ilces')->where('sehir_id', $ilId)
+                        ->orderBy('ilceName', 'asc')
+                        ->get(['id', 'ilceName']);
+    
+    return response()->json([
+        'success' => true,
+        'districts' => $districts
+    ]);
 }
 
     public function RegisterSuccess() {
