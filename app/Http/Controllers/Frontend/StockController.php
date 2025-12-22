@@ -46,8 +46,8 @@ public function AllStocks($tenant_id, Request $request)
 
     $firma = Tenant::findOrFail($tenant_id);
 
-     // Trial sürecinde veya inventory feature yoksa uyarı sayfası göster
-    if (!$firma->hasFeature('inventory') || $firma->isOnTrial()) {
+     // Trial sürecinde izin ver, değilse inventory feature kontrolü yap
+    if (!$firma->isOnTrial() && !$firma->hasFeature('inventory')) {
         return view('frontend.secure.stocks.no_inventory_feature', compact('firma'));
     }
 

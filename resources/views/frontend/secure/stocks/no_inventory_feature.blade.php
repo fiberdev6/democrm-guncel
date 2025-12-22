@@ -17,21 +17,15 @@
                             ürün takibi ve envanter kontrolü özelliklerinden faydalanabilirsiniz.
                         </p>
                         
-                        @if($firma->isOnTrial())
-                        <div class="alert alert-info mb-4" style="display: flex;align-items: center;justify-content: start;">
-                            <i class="ri-information-line me-2"></i>
-                            Deneme süreciniz devam ediyor. Abonelik satın aldığınızda bu modüle erişebileceksiniz.
-                        </div>
-                        @endif
-                        
                         <div class="d-flex justify-content-center gap-2 mb-3">
                             <a href="{{ route('secure.home', $firma->id) }}" class="btn btn-secondary btn-sm">
                                 {{-- <i class="ri-arrow-left-line me-2"></i> --}}
                                 Ana Sayfaya Dön
                             </a>
-                            <a href="{{ route('abonelikler', $firma->id) }}" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #2d3748 0%, #4a5568 100%)">
-                            
-                                Planları Görüntüle
+                            <a href="{{ route('abonelikler', ['tenant_id' => $firma->id, 'feature' => 'inventory']) }}" 
+                                class="btn btn-primary btn-sm" 
+                                style="background:linear-gradient(135deg, #2d3748 0%, #4a5568 100%)">
+                                    Planları Görüntüle
                             </a>
                         </div>
                     </div>

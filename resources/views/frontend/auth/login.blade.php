@@ -163,6 +163,20 @@
                                     <option value="">Plan Seçiniz...</option>
                                     <!-- Plans will be loaded via JavaScript -->
                                 </select>
+                                <div class="trial-info" style="margin-top: 12px;
+                                    padding: 12px 16px;
+                                    background: linear-gradient(135deg, #3e546a 0%, #4a6280 100%);
+                                    border-radius: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                    </svg>
+                                    <span style="color: white; font-size: 0.9rem; font-weight: 500;">
+                                        14 gün boyunca ücretsiz
+                                    </span>
+                                </div>
                                 <div id="planInfo" class="plan-info" style="display: none;">
                                     <div class="plan-features"></div>
                                 </div>
@@ -232,6 +246,32 @@
                                 @error('firma_adi')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
+                            </div>
+
+                            <!-- İl ve İlçe Seçimi - Yan Yana -->
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #333; font-weight: 500;">
+                                    İl / İlçe <span style="color: #dc3545;">*</span>
+                                </label>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="flex: 1;">
+                                        <select name="il_id" id="il_id" class="form-select" required>
+                                            <option value="">İl Seçiniz...</option>
+                                            <!-- İller JavaScript ile yüklenecek -->
+                                        </select>
+                                        @error('il_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <select name="ilce_id" id="ilce_id" class="form-select" required disabled>
+                                            <option value="">Önce İl Seçiniz...</option>
+                                        </select>
+                                        @error('ilce_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="mb-3">
@@ -390,15 +430,15 @@
             });
 
             // Plan selection change event
-            $('#subscription_plan').on('change', function() {
-                const selectedOption = $(this).find('option:selected');
-                if (selectedOption.val()) {
-                    const planData = selectedOption.data();
-                    showPlanInfo(planData);
-                } else {
-                    hidePlanInfo();
-                }
-            });
+            // $('#subscription_plan').on('change', function() {
+            //     const selectedOption = $(this).find('option:selected');
+            //     if (selectedOption.val()) {
+            //         const planData = selectedOption.data();
+            //         showPlanInfo(planData);
+            //     } else {
+            //         hidePlanInfo();
+            //     }
+            // });
 
             // Form toggle functionality
             let isLoginMode = true;
@@ -465,9 +505,28 @@
                         let defaultPlan = null;
                         
                         response.plans.forEach(function(plan) {
-                            const option = $('<option></option>')
-                                .attr('value', plan.id)
-                                .text(`${plan.name} - (14 gün ücretsiz)`)
+                            // Limit bilgilerini formatla
+                let limitText = '';
+                const users = plan.limits.users || 0;
+                const dealers = plan.limits.dealers || 0;
+                
+                // Kullanıcı sayısı
+                if (users == -1) {
+                    limitText = 'Sınırsız Kullanıcı';
+                } else if (users > 0) {
+                    limitText = users + ' Kullanıcı';
+                }
+                
+                // Bayi sayısı (varsa)
+                if (dealers == -1) {
+                    limitText += limitText ? ', Sınırsız Bayi' : 'Sınırsız Bayi';
+                } else if (dealers > 0) {
+                    limitText += limitText ? ', ' + dealers + ' Bayi' : dealers + ' Bayi';
+                }
+                
+                const option = $('<option></option>')
+                    .attr('value', plan.id)
+                    .text(`${plan.name}${limitText ? ' - ' + limitText : ''}`)
                                 .data('name', plan.name)
                                 .data('price', plan.price)
                                 .data('billing_cycle', plan.billing_cycle)
@@ -488,16 +547,16 @@
                         
                         if (response.selected_plan_id) {
                             select.val(response.selected_plan_id);
-                            const selectedOption = select.find('option:selected');
-                            if (selectedOption.val()) {
-                                showPlanInfo(selectedOption.data());
-                            }
+                            // const selectedOption = select.find('option:selected');
+                            // if (selectedOption.val()) {
+                            //     showPlanInfo(selectedOption.data());
+                            // }
                         } else if (defaultPlan) {
                             select.val(defaultPlan.id);
-                            const selectedOption = select.find('option:selected');
-                            if (selectedOption.val()) {
-                                showPlanInfo(selectedOption.data());
-                            }
+                            // const selectedOption = select.find('option:selected');
+                            // if (selectedOption.val()) {
+                            //     showPlanInfo(selectedOption.data());
+                            // }
                         }
                     },
                     error: function(xhr) {
@@ -682,6 +741,8 @@
                             email: $('#registerEmail').val(),
                             vergiNo: $('#vergiNo').val(),
                             firma_adi: $('#firma_adi').val(),
+                            il_id: $('#il_id').val(),          
+                            ilce_id: $('#ilce_id').val(),
                             tel: $('#tel').val(),
                             password: $('#registerPassword').val(),
                             password_confirmation: $('#password_confirmation').val(),
@@ -726,63 +787,71 @@
                     }
 
                     try {
-                        await validateStepOnServer(currentStep);
-                        currentStep++;
-                        showStep(currentStep);
-                        
-                        if (currentStep === 3 && !smsSent) {
-                            sendSMS();
-                        }
-                    } catch (error) {
-                        if (error.errors) {
-                            displayErrors(error.errors);
-                        } else {
-                            toastr.error(error.message || 'Bir hata oluştu.');
-                        }
-                    }
-                } else if (currentStep === 3) {
-                    if (!smsSent) {
-                        sendSMS();
-                    } else {
-                        verifySMSAndComplete();
-                    }
-                }
+            await validateStepOnServer(currentStep);
+            
+            // Step 2'den Step 3'e geçiyorsak, önce SMS gönder
+            if (currentStep === 2) {
+                await sendSMS();
+            }
+            
+            currentStep++;
+            showStep(currentStep);
+            
+        } catch (error) {
+            if (error.errors) {
+                displayErrors(error.errors);
+            } else {
+                toastr.error(error.message || 'Bir hata oluştu.');
+            }
+        }
+    } else if (currentStep === 3) {
+        verifySMSAndComplete();
+    }
             });
 
             function sendSMS() {
-                const formData = {
-                    subscription_plan: $('#subscription_plan').val(),
-                    vergiNo: $('#vergiNo').val(),
-                    name: $('#name').val(),
-                    username: $('#username').val(),
-                    email: $('#registerEmail').val(),
-                    firma_adi: $('#firma_adi').val(),
-                    tel: $('#tel').val(),
-                    password: $('#registerPassword').val(),
-                    password_confirmation: $('#password_confirmation').val(),
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                };
+                return new Promise((resolve, reject) => {
+        const formData = {
+            subscription_plan: $('#subscription_plan').val(),
+            vergiNo: $('#vergiNo').val(),
+            name: $('#name').val(),
+            username: $('#username').val(),
+            email: $('#registerEmail').val(),
+            firma_adi: $('#firma_adi').val(),
+            il_id: $('#il_id').val(),               // EKLE
+            ilce_id: $('#ilce_id').val(), 
+            tel: $('#tel').val(),
+            password: $('#registerPassword').val(),
+            password_confirmation: $('#password_confirmation').val(),
+            _token: $('meta[name="csrf-token"]').attr('content')
+        };
 
-                $.ajax({
-                    url: '{{ route("kayit.action") }}',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        smsSent = true;
-                        $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
-                        $('#countdownTimer').show();
-                        startCountdown();
-                        toastr.success('SMS başarıyla gönderildi!');
-                    },
-                    error: function(xhr) {
-                        const errors = xhr.responseJSON.errors;
-                        if (errors) {
-                            displayErrors(errors);
-                        } else {
-                            toastr.error('SMS gönderilirken bir hata oluştu.');
-                        }
-                    }
-                });
+        $.ajax({
+            url: '{{ route("kayit.action") }}',
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                smsSent = true;
+                $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
+                $('#countdownTimer').show();
+                startCountdown();
+                toastr.success('SMS başarıyla gönderildi!');
+                resolve(response);
+            },
+            error: function(xhr) {
+                const errors = xhr.responseJSON?.errors;
+                if (errors) {
+                    // Hataları göster ama Step 2'de kal
+                    displayErrors(errors);
+                    //toastr.error('Lütfen form alanlarını kontrol ediniz.');
+                } else {
+                    const message = xhr.responseJSON?.message || 'SMS gönderilirken bir hata oluştu.';
+                    toastr.error(message);
+                }
+                reject(xhr.responseJSON);
+            }
+        });
+    });
             }
 
             $('input, select').on('input change', function() {
@@ -886,6 +955,63 @@
                 }
             @endif
         });
+    </script>
+    <script>
+        $(document).ready(function() {
+    // İlleri yükle
+    loadCities();
+
+    // İl seçildiğinde ilçeleri yükle
+    $('#il_id').on('change', function() {
+        const ilId = $(this).val();
+        const ilceSelect = $('#ilce_id');
+        
+        if (ilId) {
+            ilceSelect.prop('disabled', true).html('<option value="">Yükleniyor...</option>');
+            
+            $.ajax({
+                url: '{{ route("get.districts") }}',
+                method: 'GET',
+                data: { il_id: ilId },
+                success: function(response) {
+                    ilceSelect.empty().append('<option value="">İlçe Seçiniz...</option>');
+                    
+                    response.districts.forEach(function(district) {
+                        ilceSelect.append(`<option value="${district.id}">${district.ilceName}</option>`);
+                    });
+                    
+                    ilceSelect.prop('disabled', false);
+                },
+                error: function(xhr) {
+                    console.error('İlçeler yüklenirken hata:', xhr);
+                    ilceSelect.empty().append('<option value="">Hata oluştu</option>');
+                    toastr.error('İlçeler yüklenirken bir hata oluştu.');
+                }
+            });
+        } else {
+            ilceSelect.prop('disabled', true).empty().append('<option value="">Önce İl Seçiniz...</option>');
+        }
+    });
+
+    function loadCities() {
+        $.ajax({
+            url: '{{ route("get.cities") }}',
+            method: 'GET',
+            success: function(response) {
+                const select = $('#il_id');
+                select.empty().append('<option value="">İl Seçiniz...</option>');
+                
+                response.cities.forEach(function(city) {
+                    select.append(`<option value="${city.id}">${city.name}</option>`);
+                });
+            },
+            error: function(xhr) {
+                console.error('İller yüklenirken hata:', xhr);
+                toastr.error('İller yüklenirken bir hata oluştu.');
+            }
+        });
+    }
+});
     </script>
 </body>
 </html>
