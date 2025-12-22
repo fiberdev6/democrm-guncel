@@ -1,5 +1,7 @@
 @extends('frontend.secure.user_master')
 @section('user')
+<link rel="preload" as="image" href="{{ asset('frontend/img/alarm.gif') }}">
+
  <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>-->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -338,7 +340,9 @@
                     <div class="row mb-3">
                         <label class="col-sm-4">Kaynak:<span class="text-danger">*</span></label>
                         <div class="col-sm-8">
-                            <input name="kaynak" class="form-control" type="text" required>
+                            <input name="kaynak" id="kaynakInput" class="form-control" type="text" maxlength="18"  required><small class="text-muted">
+                                <span id="kaynakCounter">0</span> / 18
+                            </small>
                         </div>
                     </div>
                     <div class="row">
@@ -1782,4 +1786,22 @@
       });
     });
   </script>
+
+  <script>
+$(document).ready(function() {
+    // Karakter sayacı
+    $('#kaynakInput').on('input', function() {
+        var length = $(this).val().length;
+        $('#kaynakCounter').text(length);
+        
+        // 16 karaktere ulaşınca kırmızı yap
+        if (length >= 18) {
+            $('#kaynakCounter').addClass('text-danger').removeClass('text-muted');
+        } else {
+            $('#kaynakCounter').removeClass('text-danger').addClass('text-muted');
+        }
+    });
+});
+</script>
+
 @endsection

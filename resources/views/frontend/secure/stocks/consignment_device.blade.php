@@ -52,7 +52,7 @@ $stockAll = App\Models\Stock::where('firma_id', $firma->id)
   <div class="consignment-buttons-container">
     @if(is_null($konsinyeLimit) || $konsinyeLimit == -1 || $stockAll < $konsinyeLimit)
       <a data-bs-toggle="modal" data-bs-target="#addConsignmentModal" class="btn btn-success btn-sm addConsignment">
-        <i class="fas fa-plus"></i><span>Cihaz Ekle</span>
+        <span>Cihaz Ekle</span>
       </a>
     @else
       <a class="btn btn-success btn-sm addStock" disabled style="pointer-events: none; opacity: .4; cursor: default;">

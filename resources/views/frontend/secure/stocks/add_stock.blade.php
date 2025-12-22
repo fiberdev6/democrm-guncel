@@ -33,14 +33,14 @@
   <div class="row mb-1 align-items-center">
     <label class="col-sm-4 custom-p-r">Markalar<span style="color:red;">*</span></label>
     <div class="col-sm-8 custom-p-l">
-      <div class="input-group">
-        <select name="marka_id" class="form-select" required>
+      <div class="input-group input-group-sm">
+        <select name="marka_id" class="form-select form-select-sm" required>
           <option value="" selected disabled>- Seçiniz -</option>
           @foreach($markalar as $marka)
             <option value="{{ $marka->id }}">{{ $marka->marka }}</option>
           @endforeach
         </select>
-        <button class="btn btn-success" type="button"  id="addNewBrandBtn">+</button>
+        <button class="btn btn-success btn-sm" type="button"  id="addNewBrandBtn">+</button>
       </div>
     </div>
   </div>
@@ -48,14 +48,14 @@
   <div class="row mb-1">
     <label class="col-sm-4 custom-p-r">Cihaz Türü<span style="color:red;">*</span></label>
     <div class="col-sm-8 custom-p-l">
-      <div class="input-group">
-        <select name="cihaz_id" class="form-select" required>
+      <div class="input-group input-group-sm">
+        <select name="cihaz_id" class="form-select form-select-sm"  required>
           <option value="" selected disabled>- Seçiniz -</option>
           @foreach($cihazlar as $cihaz)
             <option value="{{ $cihaz->id }}">{{ $cihaz->cihaz }}</option>
           @endforeach
         </select>
-        <button class="btn btn-success" type="button"  id="addNewDeviceTypeBtn">+</button>
+        <button class="btn btn-success btn-sm" type="button"  id="addNewDeviceTypeBtn">+</button>
       </div>
     </div>
   </div>
@@ -63,14 +63,14 @@
   <div class="row mb-1">
     <label class="col-sm-4 custom-p-r">Ürün Grubu<span style="color:red;">*</span></label>
     <div class="col-sm-8 custom-p-l">
-      <div class="input-group">
-        <select name="urunKategori" class="form-select" required>
+      <div class="input-group input-group-sm">
+        <select name="urunKategori" class="form-select form-select-sm" required>
           <option value="" selected disabled>- Seçiniz -</option>
            @foreach($kategoriler as $kategori)
              <option value="{{ $kategori->id }}">{{ $kategori->kategori }}</option>
            @endforeach
         </select>
-        <button class="btn btn-success" type="button"  id="addNewCategoryBtn">+</button>
+        <button class="btn btn-success btn-sm" type="button"  id="addNewCategoryBtn">+</button>
       </div>
     </div>
   </div>
@@ -78,14 +78,14 @@
 <div class="row mb-1">
     <label class="col-sm-4 custom-p-r">Raf Seç<span style="color:red;">*</span></label>
     <div class="col-sm-8 custom-p-l">
-      <div class="input-group">
-        <select name="raf_id" class="form-select" required>
+      <div class="input-group input-group-sm">
+        <select name="raf_id" class="form-select form-select-sm" required>
           <option value="" selected disabled>- Seçiniz -</option>
            @foreach($rafListesi as $raf)
             <option value="{{ $raf->id }}">{{ $raf->raf_adi }}</option>
            @endforeach
         </select>
-        <button class="btn btn-success" type="button"  id="addNewShelfBtn">+</button>
+        <button class="btn btn-success btn-sm" type="button"  id="addNewShelfBtn">+</button>
       </div>
     </div>
 </div>
@@ -746,16 +746,39 @@ $(document).ready(function () {
 $(document).ready(function() {
     let isSubmitting = false;
     let shouldReload = false;
+    let closingSubModal = false; // Alt modal kapatılıyor mu kontrolü
     
     // Form submit edildiğinde flag'i ayarla
     $('#addStock').submit(function() {
         isSubmitting = true;
     });
     
-    // Modal kapatılmaya çalışıldığında
+    // Alt modallar kapatılmadan önce flag'i işaretle
+    $('#addBrandModal, #addDeviceTypeModal, #addCategoryModal, #addShelfModal').on('hide.bs.modal', function(e) {
+        closingSubModal = true;
+    });
+    
+    // Alt modallar kapandıktan sonra flag'i sıfırla
+    $('#addBrandModal, #addDeviceTypeModal, #addCategoryModal, #addShelfModal').on('hidden.bs.modal', function(e) {
+        closingSubModal = false;
+        
+        // Ana modal açıksa body'ye modal-open sınıfını geri ekle
+        if ($('#addStockModal').hasClass('show')) {
+            $('body').addClass('modal-open');
+        }
+    });
+    
+    // ANA MODAL kapatılmaya çalışıldığında
     $('#addStockModal').on('hide.bs.modal', function(e) {
+        // Eğer alt modal kapatılıyorsa, ana modalı etkileme
+        if (closingSubModal) {
+            return;
+        }
+        
+        // Form submit edildiyse direkt kapat
         if (isSubmitting) {
             isSubmitting = false;
+            shouldReload = true;
             return true;
         }
         
@@ -770,8 +793,13 @@ $(document).ready(function() {
         isSubmitting = false;
     });
     
-    // Modal tamamen kapandığında sayfayı yenile
+    // ANA MODAL tamamen kapandığında sayfayı yenile
     $('#addStockModal').on('hidden.bs.modal', function() {
+        // Eğer alt modal kapatılıyorsa sayfa yenileme
+        if (closingSubModal) {
+            return;
+        }
+        
         isSubmitting = false;
         if (shouldReload) {
             shouldReload = false;

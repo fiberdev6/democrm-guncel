@@ -22,12 +22,15 @@
               
               <li>
                   <a href="{{ route('super.admin.tenants') }}" class="waves-effect">
-                      <i class="fas fa-building"></i><span class="badge rounded-pill bg-success float-end"></span>
+                      <i class="fas fa-building"></i>
                       @php
                           $passiveFirmCount = \App\Models\Tenant::where('status', '0')->count();
                       @endphp
                       @if($passiveFirmCount > 0)
-                          <span class="badge rounded-pill bg-danger float-end">{{ $passiveFirmCount }}</span>
+                          <span class="badge bg-danger float-end" style="border-radius: 50%; 
+                         display: inline-flex; 
+                         align-items: center; 
+                         justify-content: center;">{{ $passiveFirmCount }}</span>
                       @endif
                       <span>Müşteriler</span>
                   </a>
@@ -79,7 +82,10 @@
                           $openTicketsCount = \App\Models\SupportTicket::where('status', 'acik')->count();
                       @endphp
                       @if($openTicketsCount > 0)
-                          <span class="badge rounded-pill bg-danger float-end">{{ $openTicketsCount }}</span>
+                          <span class="badge bg-danger float-end" style="border-radius: 50%; 
+                         display: inline-flex; 
+                         align-items: center; 
+                         justify-content: center;">{{ $openTicketsCount }}</span>
                       @endif
                       <span>Açık Talepler</span>
                   </a>

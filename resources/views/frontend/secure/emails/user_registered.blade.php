@@ -107,7 +107,6 @@
             margin: 20px 0;
             font-weight: 600;
         }
-        a{color: #ffffff!important;}
         .button:hover {
             background: linear-gradient(135deg, #e06b11 0%, #e47622 100%);
         }
@@ -163,17 +162,6 @@
                 <h2>Hoş Geldiniz!</h2>
                 <p>Hesabınız başarıyla oluşturuldu. Sisteme giriş yaparak hizmetlerimizden faydalanmaya başlayabilirsiniz.</p>
             </div>
-
-            @if(isset($mailData['firma_kodu']) && $mailData['firma_kodu'])
-            <div class="firma-kodu-box">
-                <div class="firma-kodu-label">Firma Kodunuz</div>
-                <div class="firma-kodu-value">{{ $mailData['firma_kodu'] }}</div>
-            </div>
-            <div class="warning-box">
-                <strong>⚠️ ÖNEMLİ UYARI</strong>
-                <p>Bu firma kodunu mutlaka güvenli bir yere kaydedin! Sisteme giriş yaparken bu kodu kullanacaksınız.</p>
-            </div>
-             @endif
 
              <div class="credentials-box">
                 <h4>🔐 Giriş Bilgileriniz</h4>
@@ -266,7 +254,7 @@
             
             
             <div style="text-align: center; margin: 30px 0;">
-                <a href="{{ route('giris') }}" class="button" style="">
+                <a href="{{ route('giris') }}" class="button" style="color: #ffffff!important;">
                      Sisteme Giriş Yap
                 </a>
             </div>
