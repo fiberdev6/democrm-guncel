@@ -14791,10 +14791,10 @@ div.dataTables_wrapper table#datatableOperatorStats {
 
 /* Masaüstü için normal Bootstrap davranışı */
 @media (min-width: 992px) {
-    .modal-dialog {
+    /* .modal-dialog {
         max-width: 900px;
         margin: 1.75rem auto;
-    }
+    } */
     
     .modal-dialog.modal-lg {
         max-width: 1000px;
@@ -20610,3 +20610,230 @@ margin-right: 0px !important;
     }
 }
 /****************************************** Support  ***********************************************/
+
+/****************************************** Modalların tablet görünümündeki sorunlar için  ***********************************************/
+/*********************** Servis ekleme modalı *************************/
+/* Servis Ekleme Modal - Tablet Responsive (Yan Yana) */
+
+/* Tablet için (768px - 1024px arası) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Modal genişliğini maksimuma çıkar */
+    #addServiceModal .modal-dialog {
+        max-width: 98%;
+        margin: 10px auto;
+    }
+    
+    /* Kolonlar yan yana ama eşit genişlikte */
+    #addServiceModal .row1 > .col-sm-6,
+    .servisModal .row1 > .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 5px;
+    }
+    
+    /* Card header düzenlemesi - yan yana */
+    #addServiceModal .card-header .row,
+    .servisModal .card-header .row {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    
+    #addServiceModal .card-header .col-sm-6,
+    .servisModal .card-header .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    /* Kayıt tarihi ve Acil butonu */
+    #addServiceModal .card-header .c1,
+    .servisModal .card-header .c1 {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    #addServiceModal .card-header .c1 label,
+    .servisModal .card-header .c1 label {
+        font-size: 12px;
+    }
+    
+    #addServiceModal .card-header .c1 input.form-control,
+    .servisModal .card-header .c1 input.form-control {
+        width: 100px !important;
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+    
+    /* Servis kaynağı select */
+    #addServiceModal .servisReso,
+    .servisModal .servisReso {
+        width: 120px !important;
+        font-size: 12px;
+    }
+    
+    /* Form label ve input - kompakt */
+    #addServiceModal .form-group .col-md-4.rw1,
+    .servisModal .form-group .col-md-4.rw1 {
+        flex: 0 0 30%;
+        max-width: 30%;
+        padding-right: 5px;
+    }
+    
+    #addServiceModal .form-group .col-md-8,
+    #addServiceModal .form-group .col-md-8.rw2,
+    .servisModal .form-group .col-md-8,
+    .servisModal .form-group .col-md-8.rw2 {
+        flex: 0 0 70%;
+        max-width: 70%;
+    }
+    
+    /* Label font boyutu */
+    #addServiceModal .form-group label,
+    .servisModal .form-group label {
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+    
+    /* Input ve select kompakt */
+    #addServiceModal .form-control,
+    #addServiceModal .form-select,
+    .servisModal .form-control,
+    .servisModal .form-select {
+        font-size: 13px;
+        padding: 4px 8px;
+        height: auto;
+    }
+    
+    /* Textarea yüksekliği */
+    #addServiceModal textarea.form-control,
+    .servisModal textarea.form-control {
+        rows: 2;
+        min-height: 50px;
+    }
+    
+    /* Telefon alanları yan yana */
+    #addServiceModal .form-group .col-md-4.col-6,
+    .servisModal .form-group .col-md-4.col-6 {
+        flex: 0 0 35%;
+        max-width: 35%;
+    }
+    
+    /* İl/İlçe yan yana */
+    #addServiceModal .form-group .col-md-4.col-6.custom-p-r-m-md,
+    #addServiceModal .form-group .col-md-4.col-6.custom-p-m-md,
+    .servisModal .form-group .col-md-4.col-6.custom-p-r-m-md,
+    .servisModal .form-group .col-md-4.col-6.custom-p-m-md {
+        flex: 0 0 35%;
+        max-width: 35%;
+    }
+    
+    /* Müsait zaman alanı - kompakt yan yana */
+    #addServiceModal .custom-padding-time .col-md-8,
+    .servisModal .custom-padding-time .col-md-8 {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 3px !important;
+        align-items: center;
+    }
+    
+    #addServiceModal .custom-padding-time input[type="date"],
+    .servisModal .custom-padding-time input[type="date"] {
+        width: 95px !important;
+        font-size: 12px;
+        padding: 4px 5px;
+    }
+    
+    #addServiceModal .custom-padding-time select,
+    .servisModal .custom-padding-time select {
+        width: 75px !important;
+        font-size: 12px;
+        padding: 4px 2px;
+        background-position: right 0.1rem center;
+    }
+    
+    /* Cihaz markası/türü buton küçült */
+    #addServiceModal .d-flex.align-items-center.gap-2,
+    .servisModal .d-flex.align-items-center.gap-2 {
+        gap: 5px !important;
+    }
+    
+    #addServiceModal .d-flex.align-items-center.gap-2 .btn,
+    .servisModal .d-flex.align-items-center.gap-2 .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    /* Card body padding azalt */
+    #addServiceModal .card-body,
+    .servisModal .card-body {
+        padding: 8px;
+    }
+    
+    #addServiceModal .card-body.custom-padding-bottom,
+    .servisModal .card-body.custom-padding-bottom {
+        padding: 8px;
+    }
+    
+    /* Form group spacing */
+    #addServiceModal .form-group,
+    .servisModal .form-group {
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+    }
+    
+    /* Card header kompakt */
+    #addServiceModal .card-header,
+    .servisModal .card-header {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    /* Card margin */
+    #addServiceModal .card,
+    .servisModal .card {
+        margin-bottom: 5px;
+    }
+}
+
+/* Daha küçük tablet (768px - 900px) - ekstra kompakt */
+@media (min-width: 768px) and (max-width: 900px) {
+    #addServiceModal .form-group .col-md-4.rw1,
+    .servisModal .form-group .col-md-4.rw1 {
+        flex: 0 0 28%;
+        max-width: 28%;
+    }
+    
+    #addServiceModal .form-group .col-md-8,
+    .servisModal .form-group .col-md-8 {
+        flex: 0 0 72%;
+        max-width: 72%;
+    }
+    
+    #addServiceModal .form-group label,
+    .servisModal .form-group label {
+        font-size: 11px;
+    }
+    
+    #addServiceModal .form-control,
+    #addServiceModal .form-select,
+    .servisModal .form-control,
+    .servisModal .form-select {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+    
+    /* Müsait zaman daha da kompakt */
+    #addServiceModal .custom-padding-time input[type="date"],
+    .servisModal .custom-padding-time input[type="date"] {
+        width: 85px !important;
+    }
+    
+    #addServiceModal .custom-padding-time select,
+    .servisModal .custom-padding-time select {
+        width: 65px !important;
+    }
+}
+
+/*********************** Servis düzenelme modalı *************************/

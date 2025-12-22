@@ -417,7 +417,7 @@
 
                             <div class="mt-3">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Tüm Değişiklikleri Kaydet
+                                    <i class="fas fa-save me-1"></i> Kaydet 
                                 </button>
                                 <a href="{{ url('/hakkimizda') }}" target="_blank" class="btn btn-info">
                                     <i class="fas fa-external-link-alt me-1"></i> Sayfayı Görüntüle
