@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('tenants', function (Blueprint $table) {
+            $table->timestamp('trial_starts_at')->nullable()->after('status');
+            $table->timestamp('trial_ends_at')->nullable()->after('trial_starts_at');
+            $table->boolean('trial_used')->default(false)->after('trial_ends_at');
+            $table->enum('subscription_status', [
+                'trial', 'active', 'expired', 'canceled', 'suspended'
+            ])->default('trial')->after('trial_used');
+            $table->timestamp('subscription_ends_at')->nullable()->after('subscription_status');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('tenants', function (Blueprint $table) {
+            $table->dropColumn([
+                'trial_starts_at', 'trial_ends_at', 'trial_used', 
+                'subscription_status', 'subscription_ends_at'
+            ]);
+        });
+    }
+};

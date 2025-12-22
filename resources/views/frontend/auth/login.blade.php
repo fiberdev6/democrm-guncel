@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serbis - Giriş / Kayıt</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery Mask Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+    
+    <link href="{{asset('frontend/css/login.css')}}" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+   
+</head>
+<body>
+    <div class="main-container">
+        <div class="auth-card">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
+                    <img src="{{ asset('frontend/img/logo_son.png') }}" alt="Serbis Logo" >
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-container">
+                <!-- Form Toggle -->
+                <div class="form-toggle">
+                    <div class="toggle-slider" id="toggleSlider"></div>
+                    <button class="toggle-btn active" id="loginToggle">Giriş Yap</button>
+                    <button class="toggle-btn" id="registerToggle">Kayıt Ol</button>
+                </div>
+
+                <!-- Login Form -->
+                <div class="form-section active" id="loginForm">
+                    <form method="POST" action="{{ route('giris.action') }}">
+                        @csrf
+                        <h4 class="text-center mb-3" style="color: #333; font-weight: 600;">Hoş Geldiniz</h4>
+                        <p class="text-center mb-3" style="color: #666; font-size: 0.9rem;">
+                            Kullanıcı adı, firma kodu ve şifreniz ile güvenli giriş yapabilirsiniz.
+                        </p>
+
+                        <!-- Success/Error Messages -->
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @error('username')
+                            <div class="alert alert-danger">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                        <div class="mb-3">
+                           
+                            <input type="text" name="username" id="loginUsername" class="form-control" 
+                                   placeholder="Kullanıcı Adı" required value="{{ old('username') }}">
+                        </div>
+
+                        <div class="mb-3">
+                           
+                            <div class="input-wrapper">
+                                <input type="text" name="firma_kodu" id="loginFirmaKodu" class="form-control firma-kodu" 
+                                       placeholder="Firma Kodu" required maxlength="6" value="{{ old('firma_kodu') }}">
+                                <div class="info-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                                         class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                    </svg>
+                                    <span class="tooltip-text">
+                                        Firma kodu, kayıt sırasında size verilen 6 haneli benzersiz numaradır.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            
+                            <input type="password" name="password" id="loginPassword" class="form-control" 
+                                   placeholder="Şifre" required>
+                        </div>
+
+                        <!-- Şifremi Unuttum Linki -->
+                        <div class="mb-3 d-flex justify-content-end align-items-center" style="gap: 8px;">
+                            <a href="{{ route('password.request') }}" style="color: #3e546a; font-size: 0.9rem; text-decoration: none;">
+                                Şifremi Unuttum
+                            </a>
+                            <div class="info-icon" style="position: relative; display: inline-block;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                                    class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                </svg>
+                                <span class="tooltip-text">
+                                    Sadece firma sahibi (Patron) şifresini sıfırlayabilir. Çalışanlar için şifre sıfırlama işlemini firma sahibiniz yapmalıdır.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="g-recaptcha" data-sitekey="6Ldl86UrAAAAAIo9asM85k5ajB363yYtf8FuKQgu" data-action="LOGIN"></div>
+                            @if($errors->has('g-recaptcha-response'))
+                                <div class="text-danger mt-2">
+                                    <small>{{$errors->first('g-recaptcha-response')}}</small>
+                                </div>
+                            @endif
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Giriş Yap</button>
+                        
+                        <p class="text-center mb-0" style="color: #666; font-size: 0.9rem;">
+                            Hesabınız yok mu? 
+                            <a href="#" id="switchToRegister" style="color: #3e546a; font-weight: 600; text-decoration: none;">
+                                Kayıt Ol
+                            </a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div class="form-section" id="registerForm">
+                    <!-- Multi-step register form -->
+                    <form id="multiStepForm" method="POST">
+                        @csrf
+                        <h4 class="text-center mb-4" style="color: #333; font-weight: 600;">Hesap Oluşturun</h4>
+
+                        <!-- Step Indicators -->
+                        <div class="step-indicator">
+                            <div class="step active" data-step="1">
+                                <div class="step-icon">1</div>
+                                <div class="step-label">Plan</div>
+                                <div class="step-connector"></div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-icon">2</div>
+                                <div class="step-label">Kişisel</div>
+                                <div class="step-connector"></div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-icon">3</div>
+                                <div class="step-label">Firma</div>
+                                <div class="step-connector"></div>
+                            </div>
+                            <div class="step" data-step="4">
+                                <div class="step-icon">4</div>
+                                <div class="step-label">SMS</div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Plan Selection -->
+                        <div class="form-step active">
+                            <div class="mb-3">
+                                <label for="subscription_plan" class="form-label" style="color: #333; font-weight: 500;">
+                                    Abonelik Planı Seçin <span style="color: #dc3545;">*</span>
+                                </label>
+                                <select name="subscription_plan" id="subscription_plan" class="form-select" required>
+                                    <option value="">Plan Seçiniz...</option>
+                                    <!-- Plans will be loaded via JavaScript -->
+                                </select>
+                                <div id="planInfo" class="plan-info" style="display: none;">
+                                    <div class="plan-features"></div>
+                                </div>
+                                @error('subscription_plan')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Personal Information -->
+                        <div class="form-step">
+                            <div class="mb-3">
+                                <label for="vergiNo" class="form-label" style="color: #333; font-weight: 500;">
+                                    Vergi Numarası <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="vergiNo" id="vergiNo" class="form-control vergiNo" 
+                                       placeholder="Vergi Numarası" required>
+                                @error('vergiNo')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label" style="color: #333; font-weight: 500;">
+                                    Ad Soyad <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="name" id="name" class="form-control" 
+                                       placeholder="Ad Soyad" required>
+                                @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label" style="color: #333; font-weight: 500;">
+                                    Kullanıcı Adı <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="username" id="username" class="form-control" 
+                                       placeholder="Kullanıcı Adı" required minlength="3" maxlength="50">
+                                <small class="form-text" style="color: #6c757d;">Sadece harf, rakam ve alt çizgi kullanabilirsiniz.</small>
+                                @error('username')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label" style="color: #333; font-weight: 500;">
+                                    E-posta Adresiniz <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="email" name="email" id="registerEmail" class="form-control" 
+                                       placeholder="E-posta" required>
+                                @error('email')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Company Information & Password -->
+                        <div class="form-step">
+                            <div class="mb-3">
+                                <label for="firma_adi" class="form-label" style="color: #333; font-weight: 500;">
+                                    Firma Adı <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="firma_adi" id="firma_adi" maxlength="50" 
+                                       class="form-control" placeholder="Firma Adı" required>
+                                <small id="firmaAdiCounter" class="character-counter">0 / 50</small>
+                                @error('firma_adi')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="tel" class="form-label" style="color: #333; font-weight: 500;">
+                                    Firma Telefon Numarası <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="tel" id="tel" class="form-control tel" 
+                                       placeholder="5xx xxx xx xx" required>
+                                @error('tel')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="password" class="form-label" style="color: #333; font-weight: 500;">
+                                    Şifre <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="password" name="password" id="registerPassword" class="form-control" 
+                                       placeholder="Şifre" required minlength="6">
+                                <small class="form-text" style="color: #6c757d;">Şifre en az 6 karakter olmalıdır.</small>
+                                @error('password')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password_confirmation" class="form-label" style="color: #333; font-weight: 500;">
+                                    Şifre Tekrar <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" 
+                                       placeholder="Şifre Tekrar" required minlength="6">
+                                <small class="form-text" style="color: #6c757d;">Lütfen şifrenizi tekrar giriniz.</small>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: SMS Verification -->
+                        <div class="form-step">
+                            <div class="sms-info">
+                                <h5>SMS Doğrulama</h5>
+                                <p id="smsInfoText" style="margin: 0; color: #666;">
+                                    Lütfen <strong id="phoneDisplay">+90 --- --- -- --</strong> numaralı telefona gönderilen 6 haneli doğrulama kodunu giriniz.
+                                </p>
+                            </div>
+
+                            <div class="countdown-timer" id="countdownTimer" style="display: none;">
+                                <p style="margin: 0; color: #666;">Kalan süre:</p>
+                                <span class="timer" id="countdown">3:00</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="smsCode" class="form-label" style="color: #333; font-weight: 500;">
+                                    Doğrulama Kodu <span style="color: #dc3545;">*</span>
+                                </label>
+                                <input type="text" name="smsCode" id="smsCode" class="form-control" 
+                                       placeholder="6 haneli kod" required maxlength="6">
+                                <div id="smsCodeError" class="text-danger mt-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="button-group">
+                            <button type="button" class="btn btn-secondary btn-sm" id="prevBtn" style="display: none;">
+                                ← Geri
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" id="nextBtn" style="flex: 1;">
+                                İleri →
+                            </button>
+                        </div>
+
+                        <p class="text-center mt-3 mb-0" style="color: #666; font-size: 0.9rem;">
+                            Zaten hesabın var mı? 
+                            <a href="#" id="switchToLogin" style="color: #3e546a; font-weight: 600; text-decoration: none;">
+                                Giriş Yap
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Load subscription plans on page load
+            loadSubscriptionPlans();
+
+            // Input masks
+            $(".tel").mask("999 999 99 99");
+            $(".vergiNo").mask("0000000000");
+            $(".firma-kodu").mask("000000");
+            $("#smsCode").mask("000000");
+
+            // Username validation - sadece harf, rakam ve alt çizgi
+            $('#username').on('input', function() {
+                let value = $(this).val();
+                // Türkçe karakterleri değiştir
+                value = value.replace(/[İıĞğÜüŞşÖöÇç]/g, function(match) {
+                    const map = {
+                        'İ': 'I', 'ı': 'i', 'Ğ': 'G', 'ğ': 'g',
+                        'Ü': 'U', 'ü': 'u', 'Ş': 'S', 'ş': 's',
+                        'Ö': 'O', 'ö': 'o', 'Ç': 'C', 'ç': 'c'
+                    };
+                    return map[match];
+                });
+                // Sadece harf, rakam ve alt çizgi bırak
+                value = value.replace(/[^a-zA-Z0-9_]/g, '');
+                $(this).val(value);
+            });
+
+            // Password confirmation validation
+            $('#password_confirmation').on('input', function() {
+                const password = $('#registerPassword').val();
+                const confirmation = $(this).val();
+                
+                if (confirmation && password !== confirmation) {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).siblings('.text-danger').length) {
+                        $(this).after('<small class="text-danger">Şifreler eşleşmiyor.</small>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).siblings('.text-danger').remove();
+                }
+            });
+
+            $('#registerPassword').on('input', function() {
+                const password = $(this).val();
+                const confirmation = $('#password_confirmation').val();
+                
+                if (confirmation && password !== confirmation) {
+                    $('#password_confirmation').addClass('is-invalid');
+                    if (!$('#password_confirmation').siblings('.text-danger').length) {
+                        $('#password_confirmation').after('<small class="text-danger">Şifreler eşleşmiyor.</small>');
+                    }
+                } else {
+                    $('#password_confirmation').removeClass('is-invalid');
+                    $('#password_confirmation').siblings('.text-danger').remove();
+                }
+            });
+
+            // Character counter for company name
+            $('#firma_adi').on('input', function() {
+                var currentLength = $(this).val().length;
+                var maxLength = $(this).attr('maxlength');
+                $('#firmaAdiCounter').text(currentLength + " / " + maxLength);
+                
+                if (currentLength >= maxLength) {
+                    $('#firmaAdiCounter').removeClass('text-muted').addClass('text-danger');
+                } else {
+                    $('#firmaAdiCounter').removeClass('text-danger').addClass('text-muted');
+                }
+            });
+
+            // Plan selection change event
+            $('#subscription_plan').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                if (selectedOption.val()) {
+                    const planData = selectedOption.data();
+                    showPlanInfo(planData);
+                } else {
+                    hidePlanInfo();
+                }
+            });
+
+            // Form toggle functionality
+            let isLoginMode = true;
+            
+            $('#loginToggle, #switchToLogin').on('click', function(e) {
+                e.preventDefault();
+                if (!isLoginMode) {
+                    switchToLogin();
+                }
+            });
+            
+            $('#registerToggle, #switchToRegister').on('click', function(e) {
+                e.preventDefault();
+                if (isLoginMode) {
+                    switchToRegister();
+                }
+            });
+
+            function switchToLogin() {
+                isLoginMode = true;
+                $('#toggleSlider').removeClass('register');
+                $('#loginToggle').addClass('active');
+                $('#registerToggle').removeClass('active');
+                $('#loginForm').addClass('active');
+                $('#registerForm').removeClass('active');
+                
+                currentStep = 0;
+                showStep(currentStep);
+                clearInterval(countdownInterval);
+                $('#countdownTimer').hide();
+                smsSent = false;
+                
+                $('.text-danger').remove();
+                $('.form-control, .form-select').removeClass('is-invalid');
+            }
+
+            function switchToRegister() {
+                isLoginMode = false;
+                $('#toggleSlider').addClass('register');
+                $('#registerToggle').addClass('active');
+                $('#loginToggle').removeClass('active');
+                $('#registerForm').addClass('active');
+                $('#loginForm').removeClass('active');
+                
+                if (!$('#subscription_plan').val()) {
+                    loadSubscriptionPlans();
+                }
+            }
+
+            @if(session('show_register'))
+                setTimeout(function() {
+                    switchToRegister();
+                }, 100);
+            @endif
+
+            function loadSubscriptionPlans() {
+                $.ajax({
+                    url: '{{ route("get.subscription.plans") }}',
+                    method: 'GET',
+                    success: function(response) {
+                        const select = $('#subscription_plan');
+                        select.empty().append('<option value="">Plan Seçiniz...</option>');
+                        
+                        let defaultPlan = null;
+                        
+                        response.plans.forEach(function(plan) {
+                            const option = $('<option></option>')
+                                .attr('value', plan.id)
+                                .text(`${plan.name} - (14 gün ücretsiz)`)
+                                .data('name', plan.name)
+                                .data('price', plan.price)
+                                .data('billing_cycle', plan.billing_cycle)
+                                .data('users', plan.limits.users || '0')
+                                .data('dealers', plan.limits.dealers || '0')
+                                .data('stocks', plan.limits.stocks || '0')
+                                .data('tickets', plan.features.tickets || false)
+                                .data('basic_reports', plan.features.basic_reports || false)
+                                .data('inventory', plan.features.inventory || false)
+                                .data('priority_support', plan.features.priority_support || false);
+                            
+                            select.append(option);
+                            
+                            if (!defaultPlan || parseFloat(plan.price) < parseFloat(defaultPlan.price)) {
+                                defaultPlan = plan;
+                            }
+                        });
+                        
+                        if (response.selected_plan_id) {
+                            select.val(response.selected_plan_id);
+                            const selectedOption = select.find('option:selected');
+                            if (selectedOption.val()) {
+                                showPlanInfo(selectedOption.data());
+                            }
+                        } else if (defaultPlan) {
+                            select.val(defaultPlan.id);
+                            const selectedOption = select.find('option:selected');
+                            if (selectedOption.val()) {
+                                showPlanInfo(selectedOption.data());
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Plans yüklenirken hata oluştu:', xhr);
+                        toastr.error('Planlar yüklenirken bir hata oluştu.');
+                    }
+                });
+            }
+
+            function showPlanInfo(planData) {
+                const planInfo = $('#planInfo');
+                const featuresDiv = planInfo.find('.plan-features');
+                
+                function formatLimitValue(value) {
+                    if (value == -1) return 'Sınırsız';
+                    if (value == 0) return null;
+                    return value.toLocaleString('tr-TR');
+                }
+
+                let limitItems = [];
+                
+                const limits = [
+                    { key: 'users', label: 'Kullanıcı Sayısı', value: planData.users },
+                    { key: 'dealers', label: 'Alt Bayi Sayısı', value: planData.dealers },
+                    { key: 'stocks', label: 'Stok-Ürün Sayısı', value: planData.stocks },
+                ];
+
+                limits.forEach(limit => {
+                    const formattedValue = formatLimitValue(limit.value);
+                    if (formattedValue !== null) {
+                        const isUnlimited = limit.value == -1;
+                        limitItems.push(`
+                            <div class="limit-item">
+                                <span class="limit-value ${isUnlimited ? 'unlimited' : ''}">${isUnlimited ? '∞' : limit.value}</span>
+                                <span>${limit.label}</span>
+                            </div>
+                        `);
+                    }
+                });
+
+                let featureTags = [];
+                if (planData.tickets === 'true' || planData.tickets === true) {
+                    featureTags.push('<span class="feature-tag">Destek Talebi</span>');
+                }
+                if (planData.basic_reports === 'true' || planData.basic_reports === true) {
+                    featureTags.push('<span class="feature-tag">Raporlar</span>');
+                }
+                if (planData.inventory === 'true' || planData.inventory === true) {
+                    featureTags.push('<span class="feature-tag">Stok Yönetimi</span>');
+                }
+                if (planData.priority_support === 'true' || planData.priority_support === true) {
+                    featureTags.push('<span class="feature-tag">Öncelikli Destek</span>');
+                }
+
+                const compactHTML = `
+                    <div class="plan-info-compact">
+                        ${limitItems.length > 0 ? `
+                            <div class="limits-row">
+                                ${limitItems.join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${featureTags.length > 0 ? `
+                            <div class="features-compact">
+                                ${featureTags.join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                featuresDiv.html(compactHTML);
+                planInfo.show();
+            }
+
+            function hidePlanInfo() {
+                $('#planInfo').hide();
+            }
+
+            // Multi-step form functionality
+            let currentStep = 0;
+            let smsSent = false;
+            let countdownInterval = null;
+            const steps = $(".form-step");
+            
+            function showStep(stepIndex) {
+                steps.removeClass('active');
+                $(steps[stepIndex]).addClass('active');
+
+                if (stepIndex === 0) {
+                    $('#prevBtn').hide();
+                } else {
+                    $('#prevBtn').show();
+                }
+
+                if (stepIndex === steps.length - 1) {
+                    if (smsSent) {
+                        $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
+                    } else {
+                        $('#nextBtn').text('SMS Gönder');
+                    }
+                } else {
+                    $('#nextBtn').text('İleri →');
+                }
+
+                $('.step').removeClass('active finish');
+                $('.step').each(function(index) {
+                    if (index < stepIndex) {
+                        $(this).addClass('finish');
+                    } else if (index === stepIndex) {
+                        $(this).addClass('active');
+                    }
+                });
+
+                if (stepIndex === 3) {
+                    const phoneNumber = $('#tel').val();
+                    if (phoneNumber) {
+                        $('#phoneDisplay').text('+90 ' + phoneNumber);
+                    }
+                }
+            }
+
+            function validateStepFields(stepIndex) {
+                let isValid = true;
+                $(steps[stepIndex]).find('input[required], select[required]').each(function() {
+                    let value = $(this).val();
+                    if (!value || value.trim() === '') {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                        
+                        let errorDiv = $(this).siblings('.text-danger');
+                        if (errorDiv.length === 0) {
+                            $(this).after('<small class="text-danger">Bu alan zorunludur.</small>');
+                        }
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $(this).siblings('.text-danger').remove();
+                    }
+                });
+
+                // Password confirmation kontrolü
+                if (stepIndex === 2) {
+                    const password = $('#registerPassword').val();
+                    const confirmation = $('#password_confirmation').val();
+                    
+                    if (password !== confirmation) {
+                        isValid = false;
+                        $('#password_confirmation').addClass('is-invalid');
+                        if (!$('#password_confirmation').siblings('.text-danger').length) {
+                            $('#password_confirmation').after('<small class="text-danger">Şifreler eşleşmiyor.</small>');
+                        }
+                    }
+                }
+
+                return isValid;
+            }
+
+            function validateStepOnServer(stepIndex) {
+                return new Promise((resolve, reject) => {
+                    let formData = {};
+                    
+                    if (stepIndex === 0) {
+                        formData = {
+                            subscription_plan: $('#subscription_plan').val(),
+                            step: 1,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        };
+                    } else if (stepIndex === 1) {
+                        formData = {
+                            subscription_plan: $('#subscription_plan').val(),
+                            name: $('#name').val(),
+                            username: $('#username').val(),
+                            email: $('#registerEmail').val(),
+                            vergiNo: $('#vergiNo').val(),
+                            step: 2,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        };
+                    } else if (stepIndex === 2) {
+                        formData = {
+                            subscription_plan: $('#subscription_plan').val(),
+                            name: $('#name').val(),
+                            username: $('#username').val(),
+                            email: $('#registerEmail').val(),
+                            vergiNo: $('#vergiNo').val(),
+                            firma_adi: $('#firma_adi').val(),
+                            tel: $('#tel').val(),
+                            password: $('#registerPassword').val(),
+                            password_confirmation: $('#password_confirmation').val(),
+                            step: 3,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        };
+                    }
+
+                    $.ajax({
+                        url: '{{ route("validate.step") }}',
+                        method: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            resolve(response);
+                        },
+                        error: function(xhr) {
+                            reject(xhr.responseJSON);
+                        }
+                    });
+                });
+            }
+
+            function displayErrors(errors) {
+                $('.text-danger').remove();
+                $('.form-control, .form-select').removeClass('is-invalid');
+
+                Object.keys(errors).forEach(function(field) {
+                    const input = $(`[name="${field}"], #${field}`);
+                    if (input.length > 0) {
+                        input.addClass('is-invalid');
+                        input.after(`<small class="text-danger">${errors[field][0]}</small>`);
+                    }
+                });
+            }
+
+            $('#nextBtn').on('click', async function(e) {
+                e.preventDefault();
+                
+                if (currentStep < 3) {
+                    if (!validateStepFields(currentStep)) {
+                        return;
+                    }
+
+                    try {
+                        await validateStepOnServer(currentStep);
+                        currentStep++;
+                        showStep(currentStep);
+                        
+                        if (currentStep === 3 && !smsSent) {
+                            sendSMS();
+                        }
+                    } catch (error) {
+                        if (error.errors) {
+                            displayErrors(error.errors);
+                        } else {
+                            toastr.error(error.message || 'Bir hata oluştu.');
+                        }
+                    }
+                } else if (currentStep === 3) {
+                    if (!smsSent) {
+                        sendSMS();
+                    } else {
+                        verifySMSAndComplete();
+                    }
+                }
+            });
+
+            function sendSMS() {
+                const formData = {
+                    subscription_plan: $('#subscription_plan').val(),
+                    vergiNo: $('#vergiNo').val(),
+                    name: $('#name').val(),
+                    username: $('#username').val(),
+                    email: $('#registerEmail').val(),
+                    firma_adi: $('#firma_adi').val(),
+                    tel: $('#tel').val(),
+                    password: $('#registerPassword').val(),
+                    password_confirmation: $('#password_confirmation').val(),
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                };
+
+                $.ajax({
+                    url: '{{ route("kayit.action") }}',
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        smsSent = true;
+                        $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
+                        $('#countdownTimer').show();
+                        startCountdown();
+                        toastr.success('SMS başarıyla gönderildi!');
+                    },
+                    error: function(xhr) {
+                        const errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            displayErrors(errors);
+                        } else {
+                            toastr.error('SMS gönderilirken bir hata oluştu.');
+                        }
+                    }
+                });
+            }
+
+            $('input, select').on('input change', function() {
+                $(this).removeClass('is-invalid');
+                $(this).siblings('.text-danger').remove();
+            });
+
+            function verifySMSAndComplete() {
+                const smsCode = $('#smsCode').val();
+                
+                if (!smsCode || smsCode.length !== 6) {
+                    $('#smsCodeError').text('Lütfen 6 haneli doğrulama kodunu giriniz.').css('display', 'block');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("sms.verification.verify") }}',
+                    method: 'POST',
+                    data: {
+                        code: smsCode,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        toastr.success('Hesabınız başarıyla oluşturuldu!');
+                        setTimeout(function() {
+                            window.location.href = '{{ route("register.success") }}';
+                        }, 2000);
+                    },
+                    error: function(xhr) {
+                        const errorMsg = xhr.responseJSON?.message || 'Doğrulama kodu hatalı veya süresi dolmuş.';
+                        $('#smsCodeError').text(errorMsg).css('display', 'block');
+                        toastr.error(errorMsg);
+                        $('#smsCode').addClass('is-invalid');
+                    }
+                });
+            }
+
+            function startCountdown() {
+                let duration = 180;
+                
+                countdownInterval = setInterval(function() {
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = duration % 60;
+                    
+                    $('#countdown').text(
+                        minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+                    );
+                    
+                    if (duration <= 0) {
+                        clearInterval(countdownInterval);
+                        $('#countdownTimer').hide();
+                        smsSent = false;
+                        $('#nextBtn').text('SMS Gönder');
+                        toastr.warning('SMS doğrulama süresi doldu. Lütfen yeniden deneyin.');
+                    }
+                    
+                    duration--;
+                }, 1000);
+            }
+
+            $('#prevBtn').on('click', function() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                    
+                    if (currentStep < 3) {
+                        clearInterval(countdownInterval);
+                        $('#countdownTimer').hide();
+                        smsSent = false;
+                        $('#smsCodeError').hide();
+                    }
+                }
+            });
+
+            showStep(currentStep);
+
+            $('#smsCode').on('input', function() {
+                $('#smsCodeError').hide();
+            });
+
+            @if (Session::has('message'))
+                var type = "{{ Session::get('alert-type', 'info') }}"
+                toastr.options.positionClass = "toast-top-right";
+                toastr.options.timeOut = 5000;
+                toastr.options.extendedTimeOut = 1000;
+                
+                switch (type) {
+                    case 'info':
+                        toastr.info("{{ Session::get('message') }}");
+                        break;
+                    case 'success':
+                        toastr.success("{{ Session::get('message') }}");
+                        break;
+                    case 'warning':
+                        toastr.warning("{{ Session::get('message') }}");
+                        break;
+                    case 'error':
+                    case 'danger':
+                        toastr.error("{{ Session::get('message') }}");
+                        break;
+                }
+            @endif
+        });
+    </script>
+</body>
+</html>
