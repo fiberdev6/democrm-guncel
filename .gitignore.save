@@ -1,0 +1,14 @@
+/node_modules
+/vendor
+.env
+.env.*
+.DS_Store
+/public/storage
+/public/hot
+/storage/*.key
+/.idea
+/.vscode
+.history
+npm-debug.log
+yarn-error.log
+
