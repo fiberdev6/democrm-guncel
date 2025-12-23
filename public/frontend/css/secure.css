@@ -789,7 +789,7 @@ form .mb-3 {
   padding: 5px;
 }
 
-@media (min-width: 1367px) {
+/* @media (min-width: 1367px) {
   #addOffer {
     max-width: 930px;
   }
@@ -798,7 +798,7 @@ form .mb-3 {
     max-width: 930px;
   }
 
-}
+} */
 
 @media (max-width: 991px) {
   #editOffer .card.f3 .row .rw1 {
@@ -20837,3 +20837,160 @@ margin-right: 0px !important;
 }
 
 /*********************** Servis düzenelme modalı *************************/
+/* Tablet ve küçük ekranlar için */
+@media (min-width: 576px) and (max-width: 991px) {
+    .modal-dialog.servis-modal-custom {
+        max-width: 765px !important;
+        margin: 1.75rem auto;
+    }
+}
+
+/* Desktop için */
+@media (min-width: 992px) {
+    .modal-dialog.servis-modal-custom {
+        max-width: 980px !important;
+        margin: 1.75rem auto;
+    }
+}
+
+/* Mobil için (576px altı) */
+@media (max-width: 575px) {
+    .modal-dialog.servis-modal-custom {
+        max-width: 95% !important;
+        margin: 0.5rem auto;
+    }
+}
+/*********************** Teklif düzenleme modalı *************************/
+/* Teklif Modal Genişliği */
+@media (min-width: 576px) and (max-width: 991px) {
+    #editOfferModal .modal-dialog.servis-modal-custom {
+        max-width: 95% !important; /* Tablet'te tam genişlik kullan */
+        margin: 1rem;
+    }
+}
+
+@media (min-width: 992px) {
+    #editOfferModal .modal-dialog.servis-modal-custom {
+        max-width: 980px !important; /* Desktop'ta geniş */
+    }
+}
+
+/* Teklif Form Kartları */
+@media (max-width: 991px) {
+    #editOfferModal .card-offer.col-sm-6 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 10px;
+    }
+}
+
+/* Form Label ve Input Düzeni */
+@media (max-width: 767px) {
+    /* Mobilde label ve input alt alta */
+    #editOfferModal .rw1 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 5px;
+    }
+    
+    #editOfferModal .rw2,
+    #editOfferModal .rw3,
+    #editOfferModal .rw4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    /* Tablet'te oranları ayarla */
+    #editOfferModal .col-md-4.rw1 {
+        flex: 0 0 35% !important;
+        max-width: 35% !important;
+    }
+    
+    #editOfferModal .col-md-8.rw2 {
+        flex: 0 0 65% !important;
+        max-width: 65% !important;
+    }
+}
+
+/* Ürün Satır Kolonları */
+@media (max-width: 767px) {
+    #editOfferModal .satirBody .col-5 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 5px;
+    }
+    
+    #editOfferModal .satirBody .col-2 {
+        flex: 0 0 33.33% !important;
+        max-width: 33.33% !important;
+    }
+    
+    #editOfferModal .satirBody .col-3 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-top: 5px;
+    }
+}
+
+/* Custom Gutter Düzeltmesi */
+#editOfferModal .custom-gutter {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+#editOfferModal .custom-rw2 {
+    padding-left: 5px !important;
+}
+
+/* KDV Satırı Özel Düzen */
+@media (max-width: 767px) {
+    #editOfferModal .row.form-group .col-md-1 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 5px;
+    }
+    
+    #editOfferModal .row.form-group .col-md-3.col-6 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+    
+    #editOfferModal .row.form-group .col-md-8.col-6 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+}
+
+/* Modal Body Padding */
+#editOfferModal .modal-body {
+    padding: 15px !important;
+}
+
+/* Card Margins */
+#editOfferModal .card-offer {
+    margin-bottom: 10px;
+}
+
+#editOfferModal .card-offer:last-child {
+    margin-bottom: 0;
+}
+
+/*********************** Başlık düzenlemeleri *************************/
+.card-header-custom2
+{
+    background-color: #f7f7f7;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+    margin-bottom: 7px;
+    padding: 4px 7px !important;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .card-header-custom2
+  {
+    margin-top: 33px;
+  }
+}

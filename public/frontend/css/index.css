@@ -196,13 +196,6 @@ margin: 8px;
 padding: 12px;
 }
 
-.stat-card { 
-margin-bottom: 8px;
-padding: 14px 18px;
-}
-
-.stat-value { font-size: 1.8rem; }
-.stat-icon { font-size: 1.5rem; }
 
 .row { 
 margin-left: -6px;
@@ -213,6 +206,57 @@ margin-right: -6px;
 padding-left: 6px;
 padding-right: 6px; 
 }
+
+.stat-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px !important;
+        gap: 5px;
+    }
+    
+    /* Sol taraf - Yazı ve sayı yan yana */
+    .stat-card .stat-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        opacity: 1;
+        margin-bottom: 0;
+        display: inline;
+        order: 2;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 0.95rem; /* Label ile aynı */
+        font-weight: 500; /* Label ile aynı */
+        margin-bottom: 0;
+        display: inline;
+        order: 3;
+    }
+    
+    /* Parantez - aynı font büyüklüğünde */
+    .stat-card .stat-value::before {
+        content: " (";
+        font-size: 0.95rem; /* Aynı boyut */
+        font-weight: 500; /* Aynı ağırlık */
+    }
+    
+    .stat-card .stat-value::after {
+        content: ")";
+        font-size: 0.95rem; /* Aynı boyut */
+        font-weight: 500; /* Aynı ağırlık */
+    }
+    
+    /* İkon - sağ tarafa */
+    .stat-card .stat-icon {
+        float: none;
+        font-size: 2rem;
+        opacity: 0.8;
+        margin-top: 0;
+        order: 4;
+        flex-shrink: 0;
+        margin-left: auto;
+    }
 }
 
 /* 576px breakpoint'i 768px'den SONRA gelmeli */
@@ -222,13 +266,27 @@ margin-bottom: 2px !important;
 padding: 6px 13px !important;   
 }
 
-.stat-value { font-size: 1.6rem !important; }
 .stat-icon { font-size: 1.3rem !important; }
 
 .dashboard-container {
 margin: 5px !important;
 padding: 10px !important;
 }
+.stat-card {
+        padding: 12px 14px !important;
+    }
+    
+    .stat-card .stat-label,
+    .stat-card .stat-value,
+    .stat-card .stat-value::before,
+    .stat-card .stat-value::after {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 1.8rem;
+    }
 }
 @media (max-width: 768px) {
 .chart-container {
@@ -479,7 +537,6 @@ overflow-y: auto;
 /* Responsive */
 @media (max-width: 768px) {
 .dashboard-container { margin: 10px; padding: 15px; }
-.stat-card { margin-bottom: 12px; padding: 16px 20px; }
 .stat-value { font-size: 2rem; }
 .stat-icon { font-size: 1.6rem; }
 .chart-container, .dashboard-card { height: auto; min-height: 320px; }

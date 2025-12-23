@@ -357,10 +357,8 @@
     </div>
 </div>
   <!-- edit modal content -->
-  <div id="editServiceDescModal" class="modal fade" data-bs-backdrop="static" tabindex='-1'> {{--data-bs-backdrop="static"
-    data-bs-keyboard="false" modalın hemen kapanmaması için bunu eklemiştim. Eğer eklenmesi gerekirse aria-hidden in
-    yanına ekleyebilirsin--}}
-    <div class="modal-dialog modal-lg service-modal" style="width: 980px;">
+  <div id="editServiceDescModal" class="modal fade" data-bs-backdrop="static" tabindex='-1'>
+    <div class="modal-dialog modal-lg servis-modal-custom">
       <div class="modal-content">
         <div class="modal-header">
           <h6 class="modal-title" id="editCustomerLabel">Servis Bilgileri Düzenle</h6>
@@ -371,7 +369,8 @@
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
+</div><!-- /.modal -->
+
   <!-- edit modal content -->
   <div id="editServiceCustomerModal" class="modal fade" style="padding-top: 50px;background: rgba(0, 0, 0, 0.50);">
     <div class="modal-dialog custom-size">

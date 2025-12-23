@@ -5,12 +5,11 @@
         <!-- Başlık -->
         <div class="row">
             <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0 text-dark">
-                        <i class="fas fa-ticket-alt me-2 text-primary"></i>
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between card-header-custom2">
+                    <span class="mb-sm-0 text-dark">
                         Destek Talebi: {{ $ticket->ticket_number }}
-                    </h4>
-                    <div class="page-title-right">
+                    </span>
+                    <div class="page-title-right" style="font-size: 12px;">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('secure.home', Auth::user()->tenant_id) }}" class="text-decoration-none">Ana Sayfa</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('support.index', Auth::user()->tenant_id) }}" class="text-decoration-none">Destek Taleplerim</a></li>

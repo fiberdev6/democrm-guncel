@@ -92,7 +92,7 @@
         
 <!-- add modal content -->
 <div id="addOfferModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog servis-modal-custom">
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title" id="myModalLabel">Teklif Ekle</h6>
@@ -107,7 +107,7 @@
 
 <!-- edit modal content -->
 <div id="editOfferModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog servis-modal-custom">
     <div class="modal-content">
       <div class="modal-header">
         <h6 class="modal-title" id="myModalLabel">Teklif Düzenle</h6>

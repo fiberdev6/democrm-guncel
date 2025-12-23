@@ -2,8 +2,8 @@
 @section('user')
 <div class="page-content">
 
-  <div class="container-fluid py-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Ödeme</h2>
+  <div class="container-fluid ">
+          <div class="card-header card-header-custom2 sayfaBaslik">Ödeme</div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Sol taraf: Sipariş ve Ödeme Bilgileri -->

@@ -5,11 +5,7 @@
     <div class="row">
       <div class="col-12">
         <div class="card" style="margin-bottom: 0!important;">
-          <div class="card-header" style="padding: 5px!important;">
-            <h3 class="card-title">
-              Ödeme Geçmişi
-            </h3>
-          </div>
+          <div class="card-header card-header-custom2 sayfaBaslik">Ödeme Geçmişi</div>
 
           <div class="card-body">
             <!-- Filtreleme Formu -->

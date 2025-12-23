@@ -6,12 +6,11 @@
         <!-- Başlık -->
         <div class="row">
             <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between card-header-custom2">
                     <h4 class="mb-sm-0">
-                        <i class="fas fa-headset text-primary me-2"></i>
                         Destek Taleplerim
                     </h4>
-                    <div class="page-title-right">
+                    <div class="page-title-right" style="font-size: 12px;">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('secure.home', Auth::user()->tenant_id) }}">Ana Sayfa</a></li>
                             <li class="breadcrumb-item active">Destek Taleplerim</li>
