@@ -8,7 +8,7 @@
                 <div class="card">
                     <div class="card-header" style="padding: 7px !important;">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-credit-card me-2"></i>Güvenli Ödeme
+                            Güvenli Ödeme
                         </h5>
                     </div>
                     <div class="card-body p-0">

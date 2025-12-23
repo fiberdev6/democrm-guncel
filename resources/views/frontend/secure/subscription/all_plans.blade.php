@@ -3,7 +3,7 @@
   <script src="https://cdn.tailwindcss.com"></script>  
   <div class="page-content" id="subscriptionPlansPage">
     <div class="container-fluid">
-          <h2 class="text-2xl font-bold text-gray-800">Ödeme</h2>
+          <div class="card-header card-header-custom2 sayfaBaslik">Ödeme</div>
 
       <div class="row ">
 

@@ -7,12 +7,12 @@
         <!-- Başlık -->
         <div class="row">
             <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between card-header-custom2">
+                    
                         
                         Yeni Destek Talebi
-                    </h4>
-                    <div class="page-title-right">
+                    
+                    <div class="page-title-right" style="font-size: 12px;"> 
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('secure.home', Auth::user()->tenant_id) }}">Ana Sayfa</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('support.index', Auth::user()->tenant_id) }}">Destek Taleplerim</a></li>

@@ -1,9 +1,10 @@
 @extends('frontend.secure.user_master')
 @section('user')
 
-<div class="page-content">
+<div class="page-content" id="aboneadim2">
   <div class="container-fluid">
-    <h2 class="text-2xl font-bold text-gray-800 mb-1">Fatura Bilgileri</h2>
+              <div class="card-header card-header-custom2 sayfaBaslik">Fatura Bilgileri</div>
+
 
     <form action="{{ route('subscription.process', [$tenant_id, $planid]) }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-2">
       @csrf
