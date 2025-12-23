@@ -9,10 +9,7 @@
            <!-- Modern Header Card -->
             <div class="card card-statics shadow-sm istatistik-card mt-2">
                 <div class="card-header card-statics-header sayfaBaslik d-flex justify-content-between align-items-center col-c">
-                    <h5 class="mb-0 d-flex align-items-center head-b">
-                        <i class="fas fa-chart-line me-1"></i> <!-- ikon -->
-                        Servis İstatistikleri
-                    </h5>
+                <span class="custom-header" style="font-weight: 600; color: #2c3e50; font-size: 16px;">Servis İstatistikleri</span>
                 <div class="btn-group mb-1" id="servis_s_filtre">
                     <button class="btn btn-dark btn-sm dropdown-toggle filtrele" type="button" data-bs-toggle="dropdown">
                         Filtrele <i class="mdi mdi-chevron-down"></i>
@@ -293,7 +290,7 @@
                 <div class="card card-statics shadow-sm servisSayilariChart" style="height: 300px;">
                     <div class="card-header card-statics-header  d-flex justify-content-between align-items-center col-c">
                         <div class="d-flex px-1 align-items-center head-padding">
-                            <h5 class="mb-0"><i class="fas fa-chart-line me-1"></i>Servis Sayıları</h6>
+                            <span class="custom-header" style="font-weight: 600; color: #2c3e50; font-size: 16px;">Servis Sayıları</span>
                         </div>
                         <ul class="nav nav-tabs border-0" role="tablist">
                             <li class="nav-item">
@@ -327,7 +324,7 @@
                 <div class="card card-statics shadow-sm servisSaatleriChart" style="height: 300px;">
                     <div class="card-header card-statics-header  d-flex justify-content-between align-items-center col-j">
                         <div class="d-flex align-items-center head-padding px-1">
-                            <h5 class="mb-0"><i class="fas fa-clock me-1"></i>Saat Aralıkları</h6>
+                            <span class="custom-header" style="font-weight: 600; color: #2c3e50; font-size: 16px;">Saat Araıkları</span>
                         </div>
                         <!-- Tab Navigation -->
                         <ul class="nav nav-tabs border-0 grafik-csutom" role="tablist">
