@@ -1,7 +1,6 @@
 @extends('frontend.secure.user_master')
 @section('user')
 
-{{-- resources/views/components/storage-widget.blade.php --}}
 
 @php
     $storageInfo = auth()->user()->tenant->getStorageInfo();
@@ -178,7 +177,7 @@
                 <i class="fas fa-arrow-up"></i>
                 <span>Planı Yükselt</span>
             </a>
-            <a href="{{ route('storage.packages', $firma->id) }}" class="btn btn-storage">
+            <a href="{{ route('storage.packages', $firma->id) }}" class="btn btn-storage" id="ekDepoBtn">
                 <i class="fas fa-plus-circle"></i>
                 <span>Ek Depolama Al</span>
             </a>
@@ -249,20 +248,34 @@ function refreshStorageInfo() {
     widget.classList.add('loading');
     refreshBtn.querySelector('i').style.animation = 'spin 1s linear infinite';
     
-    fetch(`/{{ auth()->user()->tenant->id }}/depolama-alani/bilgisi`)
-        .then(response => response.json())
+    // YENİ JSON endpoint'i kullan
+    const url = '{{ route("depolama.bilgisi.json", ["tenant_id" => auth()->user()->tenant->id]) }}';
+    
+    fetch(url)
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Sunucudan JSON yerine HTML döndü. Route kontrol edilmeli.");
+            }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 updateStorageDisplay(data.storage_info);
                 showToast('Storage bilgileri güncellendi', 'success');
+            } else {
+                throw new Error(data.message || 'Bilinmeyen hata');
             }
         })
         .catch(error => {
-            console.error('Storage info update error:', 'error');
-            showToast('Güncelleme sırasında hata oluştu', 'error');
+            console.error('Storage info update error:', error);
+            showToast('Güncelleme sırasında hata oluştu: ' + error.message, 'error');
         })
         .finally(() => {
-            // Remove loading state
             widget.classList.remove('loading');
             refreshBtn.querySelector('i').style.animation = '';
         });
@@ -359,15 +372,24 @@ function updateProgressColors(info) {
 // }
 
 function loadStorageDetails() {
-    // Load detailed storage breakdown
-    fetch(`/{{ auth()->user()->tenant->id }}/storage/details`)
-        .then(response => response.json())
+    const url = '{{ route("tenant.storage.details", ["tenant_id" => auth()->user()->tenant->id]) }}';
+    
+    fetch(url)
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Storage details: JSON yerine HTML döndü");
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 updateDetailedInfo(data.details);
             }
         })
-        .catch(error => console.error('Storage details error:', error));
+        .catch(error => {
+            console.error('Storage details error:', error);
+        });
 }
 
 function updateDetailedInfo(details) {

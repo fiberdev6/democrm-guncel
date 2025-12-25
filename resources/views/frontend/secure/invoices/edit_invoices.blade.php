@@ -17,20 +17,21 @@
         <input type="date" name="faturaTarihi" class="form-control datepicker kayitTarihi" value="{{ \Carbon\Carbon::parse($invoice_id->faturaTarihi)->format('Y-m-d')}}" style="width: 150px; background:#fff" required>
     </div>
 
-    <!-- Sağ Taraf Grubu (İkon) -->
-    @if(!$invoice_id->formalized)
-    <span>
-        <a href="#" data-id="{{$invoice_id->musteriid}}" class="faturaMusteriDuzenleBtn">
-            <i class="fas fa-edit" style="font-size: 15px; color: red; text-shadow: none;"></i>
-        </a>
-    </span>
-    @endif
+    
 </div>
     </div>
   </div> 
 
   <div class="card card-invoices f2">
-     <div class="card-header card-invoices-header">MÜŞTERİ BİLGİSİ</div>
+     <div class="card-header card-invoices-header d-flex justify-content-between align-items-center">
+         <span>MÜŞTERİ BİLGİSİ</span>
+         
+         @if(!$invoice_id->formalized)
+         <a href="#" data-id="{{$invoice_id->musteriid}}" class="faturaMusteriDuzenleBtn" title="Müşteri Bilgilerini Düzenle">
+             <i class="fas fa-edit" style="font-size: 15px; color: #dc3545; text-shadow: none;"></i>
+         </a>
+         @endif
+     </div>
      <div class="card-body card-invoices-body">
         <div class="row" style="font-size: 14px;">
     <!-- Sol sütun: Servis -->
@@ -117,7 +118,7 @@
               @if($hasParasutIntegration)
                 <input type="text" name="faturaNumarasi" class="form-control buyukYaz faturaNumarasi" value="" disabled placeholder="Paraşüt tarafından atanacak">
               @else
-                <input type="text" name="faturaNumarasi" class="form-control buyukYaz faturaNumarasi" value="">
+                <input type="text" name="faturaNumarasi" class="form-control buyukYaz faturaNumarasi" value="{{$invoice_id->faturaNumarasi}}">
               @endif
             </div>
           </div>

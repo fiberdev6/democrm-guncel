@@ -14861,7 +14861,7 @@ div.dataTables_wrapper table#datatableOperatorStats {
       }
 
       #cash_transactions .pageDetail .searchWrap {
-        margin-bottom: 0px !important;
+        /* margin-bottom: 0px !important; */
       }
      
       #cash_transactions div.dataTables_filter input {
@@ -16085,6 +16085,9 @@ margin-right: 0px !important;
     color: white;
     flex: 1;
 }
+#ekDepoBtn {background: rgba(255, 255, 255, 0.1);
+    color: white;
+    flex: 1;}
 #storageInfoPage .btn {
     display: flex;
     align-items: center;
@@ -16495,6 +16498,7 @@ margin-right: 0px !important;
     }
     #batchPlanning .sag{
       margin-top: 20px !important;
+      padding-left: 12px!important;
     }
   }
 
@@ -18899,6 +18903,7 @@ margin-right: 0px !important;
     #allIntegrationsPage .pageDetail .searchWrap {
         margin-bottom: 0px !important;
     }
+    .integratiPurchase {margin-top: 35px;}
 }
 /************************ İnvoices **************************/
 /********* Add İnvoices ***********/
