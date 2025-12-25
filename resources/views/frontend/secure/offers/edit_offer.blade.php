@@ -25,9 +25,9 @@
   
           <div class="row form-group">
             <div class="col-md-4 rw1 col-form-label"><label>Müşteri Bilgileri</label></div>
-            <div class="col-md-8 rw2 col-form-label"><textarea class="form-control musBilgileri" disabled style="height: 77px;resize: none !important">{{$musteri->adSoyad}}
-            0{{$musteri->tel1}} 
-            {{$musteri->adres}} - {{$musteri->state->ilceName}}/{{$musteri->country->name}}</textarea>
+            <div class="col-md-8 rw2 col-form-label"><textarea class="form-control musBilgileri" disabled style="height: 77px; resize: none !important;">{{ $musteri->adSoyad }}
+0{{ $musteri->tel1 }}
+{{ $musteri->adres }} - {{ $musteri->state->ilceName }}/{{ $musteri->country->name }}</textarea>
             </div>
           </div>
         </div>

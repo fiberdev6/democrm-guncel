@@ -219,7 +219,7 @@
             </div>
 
             <div class="row form-group" style="border:0">
-              <div class="col-md-4 rw1"><label>Toplam Yazıyla</label></div>
+              <div class="col-md-4 rw1"><label>Toplam Yazıyla<span style="font-weight: bold; color: red;">*</span></label></div>
               <div class="col-md-8 rw2"><input type="text" name="toplamYazi" autocomplete="off" class="form-control buyukYaz toplamYazi" required></div>
             </div>
 

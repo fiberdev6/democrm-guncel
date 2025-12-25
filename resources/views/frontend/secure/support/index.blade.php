@@ -83,15 +83,15 @@
                     </div>
 
                   <div class="card-body mt-3 p-0">
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show m-3 border-0 shadow-sm" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-        </div>
-    @endif
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show m-3 border-0 shadow-sm" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {{ session('success') }}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+                        </div>
+                    @endif
 
     @if($tickets->count() > 0)
         {{-- MASAÜSTÜ GÖRÜNÜM (TABLE) --}}
@@ -360,14 +360,14 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                                 <a href="{{ url('/#faq-section') }}" 
+                                    <a href="{{ route('feature.detail', 'destek-talepleri') }}" 
                                     class="btn btn-outline-primary" 
                                     target="_blank">
-                                    <i class="fas fa-question-circle me-1"></i> SSS Sayfası
-                                </a>
-                                <a href="#" class="btn btn-outline-secondary ms-2">
+                                        <i class="fas fa-question-circle me-1"></i> SSS Sayfası
+                                    </a>
+                                {{-- <a href="#" class="btn btn-outline-secondary ms-2">
                                     <i class="fas fa-book me-1"></i> Kılavuz
-                                </a>
+                                </a> --}}
                             </div>
                         </div>
                     </div>
