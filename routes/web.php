@@ -1515,6 +1515,9 @@ Route::post('/subscription/payment/callback', [SubscriptionController::class, 'p
 Route::middleware(['auth'])->group(function () {
     // Storage bilgilerini getir (middleware olmadan)
     Route::get('/{tenant_id}/depolama-alani/bilgisi', [GenelAyarlarController::class, 'getStorageInfo'])->name('depolama.bilgisi');
+    Route::get('/{tenant_id}/depolama-alani/bilgisi-json', [GenelAyarlarController::class, 'getStorageInfoJson'])
+         ->name('depolama.bilgisi.json');
+    
     // Storage detayları (bu yeni eklediğimiz)
     Route::get('/{tenant_id}/storage/details', [GenelAyarlarController::class, 'getStorageDetails'])
          ->name('tenant.storage.details');

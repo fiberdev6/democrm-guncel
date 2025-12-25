@@ -85,7 +85,7 @@
     </div>
 
     {{-- Sağ Sütun: Atama Yap Butonu --}}
-    <div class="col-md-4 custom-p-min custom-p-r-min">
+    <div class="col-md-4  custom-p-r-min">
       @php
         use App\Models\User;
 

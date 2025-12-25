@@ -93,7 +93,7 @@
     </div>
 
     <div class="text-end">
-        <button style="background-color: #343a40;border-color: #343a40;" type="submit" class="btn btn-primary">Gönder</button>
+        <button style="background-color: #343a40;border-color: #343a40;" type="submit" class="btn btn-primary btn-sm">Gönder</button>
     </div>
 </form>
 

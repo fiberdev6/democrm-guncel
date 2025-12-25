@@ -21,7 +21,7 @@
           <!-- end row -->
   
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Operatör Prim Tutarı:<span style="font-weight: bold; color: red;">*</span></label>
+            <label class="col-sm-4 col-form-label">Operatör Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
             <div class="col-sm-8">
               <input class="form-control" name="operatorPrimTutari" type="number" step="0.01" value="{{ $prim->operatorPrimTutari}}" required>
             </div>
@@ -49,7 +49,7 @@
           </div>
 
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Atölye Ustası Prim Tutarı:<span style="font-weight: bold; color: red;">*</span></label>
+            <label class="col-sm-4 col-form-label">Atölye Ustası Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
             <div class="col-sm-8">
               <input class="form-control" name="atolyePrimTutari" type="number" step="0.01" value="{{ $prim->atolyePrimTutari}}" required>
             </div>

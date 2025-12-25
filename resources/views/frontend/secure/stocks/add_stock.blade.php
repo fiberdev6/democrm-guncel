@@ -252,6 +252,7 @@ $(document).ready(function () {
     var mainModalSelector = ''; // Ana form bir modal içinde değil, doğrudan sayfada
     var hasCategories = {{ $kategoriler->isEmpty() ? 'false' : 'true' }};
     var hasShelves = {{ $rafListesi->isEmpty() ? 'false' : 'true' }};
+    
     // Select2'yi ortak bir fonksiyonla başlatmak için bir yardımcı fonksiyon
     function initializeSelect2(selector, placeholder, url) {
         var parentModal = $(selector).closest('.modal');
@@ -318,34 +319,6 @@ $(document).ready(function () {
             $(this).removeClass('is-valid').addClass('is-invalid');
         }
     });
-    
-    $(mainFormId).submit(function(event) {
-        // cleanVal() kullanarak sadece rakamları al
-        var urunKoduInput = $(this).find('input[name="urunKodu"]');
-        var urunKodu = urunKoduInput.cleanVal();
-
-        if (urunKodu.length !== 13) {
-            event.preventDefault();
-            alert('Ürün kodu tam 13 haneli olmalıdır!');
-            urunKoduInput.focus();
-            return false;
-        }
-
-        // Form gönderilmeden önce temiz değeri input'a ata
-        urunKoduInput.val(urunKodu);
-        var isValid = true;
-        $(this).find('input[required], select[required]').each(function() {
-            if (!$(this).val()) {
-                isValid = false;
-                return false;
-            }
-        });
-
-        if (!isValid) {
-            event.preventDefault();
-            alert('Lütfen zorunlu alanları doldurun.');
-        }
-    });
 
     var checkTimeout;
 
@@ -379,47 +352,26 @@ $(document).ready(function () {
         }, 600);
     });
 
-    // Ortak Modal Açma/Kapama İşlevselliği
-    function setupSubModal(buttonSelector, modalId, formId, selectName, successMessage) {
-        $(document).on('click', buttonSelector, function () {
-            var subModal = new bootstrap.Modal(document.getElementById(modalId.substring(1))); // # işaretini kaldır
-            subModal.show();
-        });
+    // ========== MODAL AÇMA BUTONLARI ==========
+    $(document).off('click', '#addNewBrandBtn').on('click', '#addNewBrandBtn', function () {
+        var subModal = new bootstrap.Modal(document.getElementById('addBrandModal'));
+        subModal.show();
+    });
 
-        $(modalId).on('hidden.bs.modal', function (e) {
-            // Eğer ana modal açıksa, body'ye modal-open sınıfını geri ekle
-            if ($(mainModalSelector).is(':visible')) {
-                $('body').addClass('modal-open');
-            }
-        });
+    $(document).off('click', '#addNewDeviceTypeBtn').on('click', '#addNewDeviceTypeBtn', function () {
+        var subModal = new bootstrap.Modal(document.getElementById('addDeviceTypeModal'));
+        subModal.show();
+    });
 
-        $(formId).submit(function(e) {
-            e.preventDefault();
-            var form = $(this);
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: form.serialize(),
-                success: function(response) {
-                    var newOption = new Option(response.text, response.id, true, true);
-                    $(mainFormId + ' select[name="' + selectName + '"]').append(newOption).trigger('change');
-                    $(modalId).modal('hide');
-                    form[0].reset();
-                    alert(successMessage);
-                },
-                error: function(xhr) {
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                    console.log(xhr.responseText);
-                }
-            });
-        });
-    }
+    $(document).off('click', '#addNewCategoryBtn').on('click', '#addNewCategoryBtn', function () {
+        var subModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+        subModal.show();
+    });
 
-    // Sub modalları kurulum
-    setupSubModal('#addNewBrandBtn', '#addBrandModal', '#addBrandForm', 'marka_id', 'Marka başarıyla eklendi.');
-    setupSubModal('#addNewDeviceTypeBtn', '#addDeviceTypeModal', '#addDeviceTypeForm', 'cihaz_id', 'Cihaz Türü başarıyla eklendi.');
-    setupSubModal('#addNewCategoryBtn', '#addCategoryModal', '#addCategoryForm', 'urunKategori', 'Cihaz Kategori başarıyla eklendi.');
-    setupSubModal('#addNewShelfBtn', '#addShelfModal', '#addShelfForm', 'raf_id', 'Raf başarıyla eklendi.');
+    $(document).off('click', '#addNewShelfBtn').on('click', '#addNewShelfBtn', function () {
+        var subModal = new bootstrap.Modal(document.getElementById('addShelfModal'));
+        subModal.show();
+    });
 
     // Ürün Düzenle Modalını açma
     $(document).on('click', '#openEditModalBtn', function() {
@@ -456,7 +408,7 @@ $(document).ready(function () {
         }, 100);
     });
 
- // ========== TOKEN VE ÇİFT SUBMİT KORUMASI ==========
+    // ========== TOKEN VE ÇİFT SUBMİT KORUMASI ==========
     let formSubmitting = false;
     let brandFormSubmitting = false;
     let deviceFormSubmitting = false;
@@ -525,7 +477,7 @@ $(document).ready(function () {
     });
     
     // Marka ekleme form koruması
-    $('#addBrandForm').submit(function(e) {
+    $('#addBrandForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         
         if (brandFormSubmitting) {
@@ -550,8 +502,6 @@ $(document).ready(function () {
                 
                 // Token'ı yenile
                 $('#brandFormToken').val(generateToken());
-                brandFormSubmitting = false;
-                submitBtn.prop('disabled', false);
             },
             error: function(xhr) {
                 var errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
@@ -572,6 +522,8 @@ $(document).ready(function () {
                 console.log(xhr.responseText);
                 
                 $('#brandFormToken').val(generateToken());
+            },
+            complete: function() {
                 brandFormSubmitting = false;
                 submitBtn.prop('disabled', false);
             }
@@ -579,7 +531,7 @@ $(document).ready(function () {
     });
     
     // Cihaz türü ekleme form koruması
-    $('#addDeviceTypeForm').submit(function(e) {
+    $('#addDeviceTypeForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         
         if (deviceFormSubmitting) {
@@ -603,8 +555,6 @@ $(document).ready(function () {
                 alert('Cihaz Türü başarıyla eklendi.');
                 
                 $('#deviceFormToken').val(generateToken());
-                deviceFormSubmitting = false;
-                submitBtn.prop('disabled', false);
             },
             error: function(xhr) {
                 var errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
@@ -622,6 +572,8 @@ $(document).ready(function () {
                 console.log(xhr.responseText);
                 
                 $('#deviceFormToken').val(generateToken());
+            },
+            complete: function() {
                 deviceFormSubmitting = false;
                 submitBtn.prop('disabled', false);
             }
@@ -629,7 +581,7 @@ $(document).ready(function () {
     });
     
     // Kategori ekleme form koruması
-    $('#addCategoryForm').submit(function(e) {
+    $('#addCategoryForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         
         if (categoryFormSubmitting) {
@@ -659,8 +611,6 @@ $(document).ready(function () {
                 }
                 
                 $('#categoryFormToken').val(generateToken());
-                categoryFormSubmitting = false;
-                submitBtn.prop('disabled', false);
             },
             error: function(xhr) {
                 var errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
@@ -678,6 +628,8 @@ $(document).ready(function () {
                 console.log(xhr.responseText);
                 
                 $('#categoryFormToken').val(generateToken());
+            },
+            complete: function() {
                 categoryFormSubmitting = false;
                 submitBtn.prop('disabled', false);
             }
@@ -685,7 +637,7 @@ $(document).ready(function () {
     });
     
     // Raf ekleme form koruması
-    $('#addShelfForm').submit(function(e) {
+    $('#addShelfForm').off('submit').on('submit', function(e) {
         e.preventDefault();
         
         if (shelfFormSubmitting) {
@@ -715,8 +667,6 @@ $(document).ready(function () {
                 }
                 
                 $('#shelfFormToken').val(generateToken());
-                shelfFormSubmitting = false;
-                submitBtn.prop('disabled', false);
             },
             error: function(xhr) {
                 var errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
@@ -734,6 +684,8 @@ $(document).ready(function () {
                 console.log(xhr.responseText);
                 
                 $('#shelfFormToken').val(generateToken());
+            },
+            complete: function() {
                 shelfFormSubmitting = false;
                 submitBtn.prop('disabled', false);
             }
@@ -808,6 +760,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
 
 
 

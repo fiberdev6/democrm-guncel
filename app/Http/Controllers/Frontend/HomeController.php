@@ -33,6 +33,7 @@ use App\Services\TescomService;
 use Illuminate\Support\Facades\Log;
 use App\Models\FrontendSetting;
 use App\Models\HomepageContent;
+use App\Models\ReceiptDesign;
 use App\Mail\ContactFormMail;
 
 class HomeController extends Controller

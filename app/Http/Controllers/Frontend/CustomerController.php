@@ -226,7 +226,7 @@ class CustomerController extends Controller
             'il' => $request->il,
             'ilce' => $request->ilce,
             'adres' => $request->address,
-            'tcNo' => $request->tcNo,
+            'tcNo' => $request->tcno,
             'vergiNo' => $request->vergiNo,
             'vergiDairesi' => $request->vergiDairesi,
             'created_at' => Carbon::now(),
@@ -291,7 +291,7 @@ class CustomerController extends Controller
                     'name' => $request->name,
                     'phone' => $request->tel1,
                     'phone2' => $request->tel2,
-                    'tc_no' => $request->tcNo,
+                    'tc_no' => $request->tcno,
                     'vergi_no' => $request->vergiNo,
                     'vergi_dairesi' => $request->vergiDairesi
                 ];

@@ -68,7 +68,6 @@
             border-radius: 5px;
             margin: 20px 0;
         }
-        a{color: #ffffff!important;}
         .contact-info {
             margin-top: 20px;
             padding-top: 20px;
@@ -96,7 +95,7 @@
             <p>14 gün boyunca sistemimizi ücretsiz olarak deneyebilir, tüm özelliklerimizi keşfedebilirsiniz.</p>
 
             <div style="text-align: center;">
-                <a href="{{ route('giris') }}" class="button">Giriş Yap</a>
+                <a href="{{ route('giris') }}" class="button" style="color: #ffffff!important;">Giriş Yap</a>
             </div>
 
             <div class="contact-info">

@@ -861,7 +861,7 @@ $(document).ready(function(){
     }).remove();
 
     // Arama kutusunu ve filtreyi sarmalamak için
-    searchContainer.addClass('flex-grow-1 me-2');
+    searchContainer.addClass('flex-grow-1 ');
     searchInput.addClass('w-100');
     searchInput.attr('placeholder', 'Kasa Hareketi Ara...');
 

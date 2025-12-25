@@ -218,6 +218,38 @@ class GenelAyarlarController extends Controller
     }
 }
 
+// JSON için ayrı endpoint
+public function getStorageInfoJson($tenant_id) {
+    try {
+        $tenant = Tenant::find($tenant_id);
+        
+        if (!$tenant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Firma bulunamadı.'
+            ], 404);
+        }
+
+        $storageInfo = $tenant->getStorageInfo();
+        
+        return response()->json([
+            'success' => true,
+            'storage_info' => $storageInfo
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Storage info error', [
+            'tenant_id' => $tenant_id,
+            'error' => $e->getMessage()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Storage bilgileri alınırken hata oluştu.'
+        ], 500);
+    }
+}
+
 /**
  * Servis fotoğrafları breakdown'ı
  */
