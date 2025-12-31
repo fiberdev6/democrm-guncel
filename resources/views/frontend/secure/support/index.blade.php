@@ -383,8 +383,7 @@ $(document).ready(function() {
     var table = $('#supportTicketsTable').DataTable({
         processing: false,
         serverSide: false,
-        ordering: false, // Tüm sıralamaları devre dışı bırak
-        //order: [[0, 'desc']],
+        ordering: false,
         
         language: {
             paginate: {
@@ -407,11 +406,50 @@ $(document).ready(function() {
         
         drawCallback: function() {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+            addEventListenersToRows();
         },
         
         dom: '<"top">rt<"bottom"i<"float-end"lp>><"clear">',
         lengthMenu: [ [25, 50, 100], [25, 50, 100] ]
     });
+
+    // Satıra tıklayınca detay açma fonksiyonu
+    function addEventListenersToRows() {
+        const tableRows = document.querySelectorAll('#supportTicketsTable tbody tr');
+        
+        tableRows.forEach(function(row) {
+            row.style.cursor = 'pointer';
+            
+            const detailButton = row.querySelector('a[title="Detay"]');
+            
+            if (detailButton) {
+                const detailUrl = detailButton.getAttribute('href');
+                
+                const newRow = row.cloneNode(true);
+                row.parentNode.replaceChild(newRow, row);
+
+                newRow.addEventListener('click', function(e) {
+                    // Buton veya link'e tıklandıysa satır event'ini engelle
+                    if (e.target.closest('a, button, form')) {
+                        return;
+                    }
+                    window.location.href = detailUrl;
+                });
+                
+                // Hover efekti
+                newRow.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(0, 123, 255, 0.05)';
+                });
+                
+                newRow.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            }
+        });
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    addEventListenersToRows();
 });
 </script>
 @endsection

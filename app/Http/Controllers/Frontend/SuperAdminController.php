@@ -2115,6 +2115,8 @@ public function homepageContent()
     $contact = HomepageContent::where('section', 'contact')->first();
     $cta = HomepageContent::where('section', 'cta')->first();
     $video = HomepageContent::where('section', 'video')->first();
+    $meta = HomepageContent::where('section', 'meta_tags')->first();
+    $googleTags = HomepageContent::where('section', 'google_tags')->first();
     
     // Eğer hero yoksa boş bir object oluştur
     if (!$hero) {
@@ -2132,8 +2134,31 @@ public function homepageContent()
     if (!$video) {
         $video = (object)['content' => []];
     }
+    if (!$googleTags) $googleTags = (object)['content' => []];
+    // Meta Tags - TÜM SAYFALARI GETİR
+    $metaPages = [
+        'home' => HomepageContent::where('section', 'meta_tags_home')->first(),
+        'about' => HomepageContent::where('section', 'meta_tags_about')->first(),
+        'features' => HomepageContent::where('section', 'meta_tags_features')->first(),
+        'pricing' => HomepageContent::where('section', 'meta_tags_pricing')->first(),
+        'sectors' => HomepageContent::where('section', 'meta_tags_sectors')->first(),
+        'integrations' => HomepageContent::where('section', 'meta_tags_integrations')->first(),
+        'contact' => HomepageContent::where('section', 'meta_tags_contact')->first(),
+        'blog' => HomepageContent::where('section', 'meta_tags_blog')->first(),
+    ];
     
-    return view('frontend.secure.super_admin.frontend.content', compact('hero', 'sectionHeaders', 'contact', 'cta', 'video'));
+    // Null olanları boş object yap
+    foreach ($metaPages as $key => $value) {
+        if (!$value) {
+            $metaPages[$key] = (object)['content' => []];
+        }
+    }
+    
+    // İlk meta'yı da gönder (geriye uyumluluk için)
+    $meta = $metaPages['home'];
+    
+
+    return view('frontend.secure.super_admin.frontend.content', compact('hero', 'sectionHeaders', 'contact', 'cta', 'video', 'meta','metaPages', 'googleTags'));
 }
 
 // İçerik Güncelleme
@@ -2141,6 +2166,60 @@ public function updateHomepageContent(Request $request)
 {
     try {
         $section = $request->input('section');
+        // ==========================================
+        // META TAGS (TÜM SAYFALAR İÇİN DİNAMİK)
+        // ==========================================
+        if (strpos($section, 'meta_tags_') === 0) {
+            $existingMeta = HomepageContent::where('section', $section)->first();
+            
+            $content = [
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'keywords' => $request->input('keywords'),
+                'og_title' => $request->input('og_title'),
+                'og_description' => $request->input('og_description'),
+                'twitter_title' => $request->input('twitter_title'),
+                'twitter_description' => $request->input('twitter_description'),
+            ];
+            
+            // Mevcut og_image'i koru
+            if ($existingMeta && isset($existingMeta->content['og_image'])) {
+                $content['og_image'] = $existingMeta->content['og_image'];
+            }
+            
+            // Yeni OG Image yüklendiyse
+            if ($request->hasFile('og_image')) {
+                // Eski görseli sil
+                if ($existingMeta && isset($existingMeta->content['og_image'])) {
+                    $oldImagePath = public_path($existingMeta->content['og_image']);
+                    if (file_exists($oldImagePath)) {
+                        @unlink($oldImagePath);
+                    }
+                }
+                
+                // Yeni görseli yükle
+                $image = $request->file('og_image');
+                $imageName = 'og_image_' . str_replace('meta_tags_', '', $section) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('frontend/img'), $imageName);
+                $content['og_image'] = 'frontend/img/' . $imageName;
+            }
+            
+            // Veritabanına kaydet
+            $result = HomepageContent::updateOrCreate(
+                ['section' => $section],
+                [
+                    'content' => $content,
+                    'is_active' => true
+                ]
+            );
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Meta Tags başarıyla kaydedildi',
+                'og_image' => $content['og_image'] ?? null
+            ]);
+        }
+        
         
         // Hero section için özel işlem
         if($section == 'hero') {
@@ -2767,6 +2846,35 @@ public function updateContactContent(Request $request)
     );
     
     return back()->with('success', 'İletişim sayfası içeriği başarıyla güncellendi!');
+}
+/**
+ * Belirli bir section'ın içeriğini getir (AJAX için)
+ */
+public function getHomepageContent(Request $request)
+{
+    $section = $request->input('section');
+    
+    if (!$section) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Section belirtilmedi'
+        ], 400);
+    }
+    
+    $content = HomepageContent::where('section', $section)->first();
+    
+    if ($content) {
+        return response()->json([
+            'success' => true,
+            'data' => $content
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'İçerik bulunamadı',
+            'data' => null
+        ]);
+    }
 }
 /*************************************************** Frontend Düzenlemeleri *****************************************************/
 

@@ -22,10 +22,10 @@
   <div class="row">
     <label class="col-sm-3 custom-p-r">Telefon</label>
     <div class="col-sm-4 col-sm-custom col-6 custom-p-r-m-md custom-p-l">
-      <input name="tel1" class="form-control phone" type="text" placeholder="Telefon 1" required>
+      <input name="tel1" class="form-control phone" type="text" placeholder="5XX XXX XX XX" required>
     </div>
     <div class="col-sm-4 col-sm-custom col-6 custom-p-m-md custom-p-l">
-      <input name="tel2" class="form-control phone" type="text" placeholder="Telefon 2">
+      <input name="tel2" class="form-control phone" type="text" placeholder="5XX XXX XX XX">
     </div>
   </div>
   

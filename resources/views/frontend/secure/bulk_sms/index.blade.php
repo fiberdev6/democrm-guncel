@@ -43,8 +43,9 @@
                                         <div class="col-md-4 rw1"><label>İl Seç</label></div>
                                         <div class="col-md-8 rw2">
                                             <select class="form-control il" id="il" name="il">
+                                                <option value="">-SEÇİNİZ-</option>
                                                 @foreach ($iller as $item)
-                                                    <option value="{{$item->id}}" {{ $item->id == 34 ? 'selected' : '' }}>{{$item->name}}</option>
+                                                    <option value="{{$item->id}}">{{$item->name}}</option>
                                                 @endforeach 
                                             </select>
                                         </div>

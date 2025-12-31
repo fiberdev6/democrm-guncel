@@ -2,19 +2,80 @@
 <html lang="tr">
 
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    {{-- ========================================== --}}
+    {{-- GOOGLE TAGS - HEAD --}}
+    {{-- ========================================== --}}
+    @php
+        $googleTags = \App\Models\HomepageContent::getSection('google_tags');
+    @endphp
 
-  @php 
-  $settings = App\Models\Settings::find(1);
-  @endphp
+    @if($googleTags && is_array($googleTags))
+        {{-- Google Analytics --}}
+        @if(!empty($googleTags['analytics_code']))
+            {!! $googleTags['analytics_code'] !!}
+        @endif
 
-  <title>Serbis CRM</title>
-  <meta content="{{$settings->site_description}}" name="description">
-  <meta content="{{$settings->site_keywords}}" name="keywords">
-
-  <!-- Favicons -->
-  <link href="{{asset($settings->favicon)}}" rel="icon">
+        {{-- Google Tag Manager - HEAD --}}
+        @if(!empty($googleTags['tag_manager_head']))
+            {!! $googleTags['tag_manager_head'] !!}
+        @endif
+    @endif
+    
+    {{-- DYNAMIC META TAGS --}}
+    @if(isset($metaTags) && $metaTags && isset($metaTags->content))
+        {{-- Title --}}
+        <title>{{ $metaTags->content['title'] ?? 'Serbis - Teknik Servis Yönetim Sistemi' }}</title>
+        
+        {{-- Basic Meta --}}
+        <meta name="description" content="{{ $metaTags->content['description'] ?? 'Teknik servis işletmenizi dijitalleştirin!' }}">
+        <meta name="keywords" content="{{ $metaTags->content['keywords'] ?? 'teknik servis yazılımı, servis yönetimi' }}">
+        
+        {{-- Open Graph / Facebook --}}
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $metaTags->content['og_title'] ?? $metaTags->content['title'] ?? 'Serbis' }}">
+        <meta property="og:description" content="{{ $metaTags->content['og_description'] ?? $metaTags->content['description'] ?? 'Teknik servis yönetimi' }}">
+        @if(isset($metaTags->content['og_image']) && $metaTags->content['og_image'])
+<meta property="og:image" content="{{ asset($metaTags->content['og_image']) }}">
+        @else
+            <meta property="og:image" content="{{ asset('frontend/img/anasayfa2.png') }}">
+        @endif
+        
+        {{-- Twitter Card --}}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ url()->current() }}">
+        <meta name="twitter:title" content="{{ $metaTags->content['twitter_title'] ?? $metaTags->content['title'] ?? 'Serbis' }}">
+        <meta name="twitter:description" content="{{ $metaTags->content['twitter_description'] ?? $metaTags->content['description'] ?? 'Teknik servis yönetimi' }}">
+        <meta name="twitter:image" content="{{ isset($metaTags->content['og_image']) ? asset($metaTags->content['og_image']) : asset('frontend/img/anasayfa2.png') }}">
+    @else
+        {{-- DEFAULT META TAGS (fallback) --}}
+        <title>Serbis - Teknik Servis Yönetim Sistemi | Bulut Tabanlı CRM Yazılımı</title>
+        <meta name="description" content="Teknik servis işletmenizi dijitalleştirin! Müşteri takibi, servis yönetimi, stok kontrolü ve cari hesap işlemlerini tek platformdan yönetin. 14 gün ücretsiz deneyin.">
+        <meta name="keywords" content="teknik servis yazılımı, servis yönetim sistemi, teknik servis crm, bulut tabanlı servis programı">
+        
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="Serbis - Teknik Servis İşletmenizi Dijitalleştirin">
+        <meta property="og:description" content="Müşteri, servis, stok ve personel yönetimini tek platformdan kontrol edin. Mobil uyumlu, kullanımı kolay, güvenli.">
+        <meta property="og:image" content="{{ asset('frontend/img/anasayfa2.png') }}">
+        
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ url()->current() }}">
+        <meta name="twitter:title" content="Serbis - Teknik Servis Yönetim Sistemi">
+        <meta name="twitter:description" content="Teknik servis süreçlerinizi dijitalleştirin. Müşteri takibi, servis yönetimi, stok kontrolü tek platformda. 14 gün ücretsiz deneme!">
+        <meta name="twitter:image" content="{{ asset('frontend/img/anasayfa2.png') }}">
+    @endif
+    
+    {{-- Canonical URL --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+    
+    {{-- Favicon --}}
+    <link rel="icon" href="{{ asset('frontend/img/favicon.ico') }}" type="image/x-icon">
+    
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,13 +97,19 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   
+
   
 
-  {!! $settings->taghead_kod !!}
+  
 </head>
 
 <body>
-  {!! $settings->tagbody_kod !!}
+
+{{-- GOOGLE TAG MANAGER - BODY --}}
+@if($googleTags && is_array($googleTags) && !empty($googleTags['tag_manager_body']))
+    {!! $googleTags['tag_manager_body'] !!}
+@endif
+
   <!-- ======= Header ======= -->
   {{-- @include('frontend.body.header') --}}
   @include('frontend.frontend_partials.navbar')
@@ -59,6 +126,34 @@
   {{-- @include('frontend.body.footer') --}}
   @include('frontend.frontend_partials.footer')
   <!-- End Footer -->
+<!-- Mobil Sabit Alt Menü -->
+@php
+    $contactInfo = \App\Models\HomepageContent::getSection('contact');
+    $mobileMenu = $contactInfo['mobile_menu'] ?? [
+        'phone' => '02129092861',
+        'email' => 'info@serbis.com.tr'
+    ];
+@endphp
+
+<div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <a href="{{ url('/kullanici-girisi') }}" class="nav-item" target="_blank">
+            <i class="fas fa-rocket"></i>
+            <span>Demo</span>
+        </a>
+        
+        <a href="mailto:{{ $mobileMenu['email'] ?? 'info@serbis.com.tr' }}" class="nav-item">
+            <i class="fas fa-envelope"></i>
+            <span>E-posta</span>
+        </a>
+        
+        <a href="tel:{{ $mobileMenu['phone'] ?? '02129092861' }}" class="nav-item">
+            <i class="fas fa-phone"></i>
+            <span>Ara</span>
+        </a>
+    </div>
+</div>
+
   <!-- <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <div id="preloader"></div> -->
@@ -133,7 +228,7 @@
         </div>
       </div>
     </div>
-  
+
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
@@ -147,7 +242,7 @@
   <script src="{{asset('frontend/vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
   <script src="{{asset('frontend/vendor/swiper/swiper-bundle.min.js')}}"></script>
   <script src="{{asset('frontend/vendor/purecounter/purecounter_vanilla.js')}}"></script>
-  <script src="{{asset('frontend/vendor/php-email-form/validate.js')}}"></script>
+  {{-- <script src="{{asset('frontend/vendor/php-email-form/validate.js')}}"></script> --}}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
  
 
@@ -215,6 +310,12 @@ $('.stop').on('click',function(){
       function doGTranslate(lang_pair){if(lang_pair.value)lang_pair=lang_pair.value;if(lang_pair=='')return;var lang=lang_pair.split('|')[1];if(GTranslateGetCurrentLang() == null && lang == lang_pair.split('|')[0])return;var teCombo;var sel=document.getElementsByTagName('select');for(var i=0;i<sel.length;i++)if(sel[i].className=='goog-te-combo')teCombo=sel[i];if(document.getElementById('google_translate_element2')==null||document.getElementById('google_translate_element2').innerHTML.length==0||teCombo.length==0||teCombo.innerHTML.length==0){setTimeout(function(){doGTranslate(lang_pair)},500)}else{teCombo.value=lang;GTranslateFireEvent(teCombo,'change');GTranslateFireEvent(teCombo,'change')}}
       if(GTranslateGetCurrentLang() != null)jQuery(document).ready(function() {jQuery('div.switcher div.selected a').html(jQuery('div.switcher div.option').find('img[alt="'+GTranslateGetCurrentLang()+'"]').parent().html());});
     </script>
+
+
+
+
+</script>
+
 </body>
 
 </html>

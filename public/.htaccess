@@ -18,4 +18,34 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
-</IfModule>
+
+    #PHP ÇALIŞTIRMAYI ENGELLE
+    # Birisi .php dosyası yüklerse çalışmasını engeller
+    <IfModule mod_php.c>
+        php_flag engine off
+    </IfModule>
+
+    <IfModule mod_php7.c>
+        php_flag engine off
+    </IfModule>
+
+    <IfModule mod_php8.c>
+        php_flag engine off
+    </IfModule>
+    # TEHLİKELİ DOSYA UZANTILARINI ENGELLE
+    # Bu uzantılara sahip dosyalara erişimi tamamen kapat
+    <FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|phar|cgi|pl|py|jsp|asp|aspx|sh|bash|exe|bat|cmd|htaccess|htpasswd|ini|log|sql|env)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    # SCRIPT ÇALIŞTIRMAYI ENGELLE
+    Options -ExecCGI -Indexes
+
+    # BU DOSYANIN GÖRÜNTÜLENMESİNİ ENGELLE
+    <Files .htaccess>
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    </IfModule>

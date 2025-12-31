@@ -7,6 +7,9 @@ use App\Observers\CompanyObserver;
 use Illuminate\Support\ServiceProvider;
 use App\Models\HomepageContent;
 use Illuminate\Support\Facades\View;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -77,5 +80,40 @@ class AppServiceProvider extends ServiceProvider
             'footerContent' => $footerContent
         ]);
 });
+        // Şifre sıfırlama rate limiter
+        RateLimiter::for('password-reset', function (Request $request) {
+            return Limit::perMinute(3)
+                ->by($request->ip())
+                ->response(function () {
+                    return back()->with([
+                        'message' => 'Çok fazla deneme yaptınız. Lütfen 1 dakika sonra tekrar deneyin.',
+                        'alert-type' => 'warning'
+                    ]);
+                });
+        });
+
+        // SMS doğrulama rate limiter
+        RateLimiter::for('sms-verify', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Çok fazla deneme yaptınız. Lütfen 1 dakika sonra tekrar deneyin.'
+                    ], 429);
+                });
+        });
+
+        // İletişim formu rate limiter
+        RateLimiter::for('contact-form', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->ip())
+                ->response(function () {
+                    return back()->with([
+                        'message' => 'Çok fazla mesaj gönderdiniz. Lütfen 1 dakika sonra tekrar deneyin.',
+                        'alert-type' => 'warning'
+                    ]);
+                });
+        });
     }
 }

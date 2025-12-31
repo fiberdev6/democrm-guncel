@@ -11,18 +11,17 @@
                 <input type="date" class="form-control datepicker planTarih" value="{{ $tomorrow }}" style="background:#fff">
               </div>
             </div>
-
             <div class="row form-group">
               <div class="col-md-4 rw1"><label>İl Seç</label></div>
               <div class="col-md-8 custom-p-min  rw2">
                 <select class="form-control il" id="il">
+                  <option value="">-SEÇİNİZ-</option>
                   @foreach ($iller as $item)
-                    <option value="{{$item->id}}" {{ $item->id == 34 ? 'selected' : '' }}>{{$item->name}}</option>
+                    <option value="{{$item->id}}">{{$item->name}}</option>
                   @endforeach                               
                 </select>
               </div>
             </div>
-
             <div class="row form-group">
               <div class="col-md-4 rw1"><label>Bölgeler</label></div>
               <div class="col-md-8  custom-p-min rw2">

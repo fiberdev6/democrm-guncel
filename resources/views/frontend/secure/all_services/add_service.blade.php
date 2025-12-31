@@ -87,17 +87,17 @@
                 </div>
                 <div class="row form-group">
                   <div class="col-md-4 rw1"><label>Telefon <span style="font-weight: bold; color: red;">*</span></label></div>
-                  <div class="col-md-4 col-6 custom-p-r-m-md rw2"><input type="text" name="tel1" class="form-control phone tel1" autocomplete="off" placeholder="TELEFON 1" required></div>
-                  <div class="col-md-4 col-6 custom-p-m-md rw2"><input type="text" name="tel2" class="form-control phone tel2" autocomplete="off" placeholder="TELEFON 2"></div>
+                  <div class="col-md-4 col-6 custom-p-r-m-md rw2"><input type="text" name="tel1" class="form-control phone tel1" autocomplete="off" placeholder="5XX XXX XX XX" required></div>
+                  <div class="col-md-4 col-6 custom-p-m-md rw2"><input type="text" name="tel2" class="form-control phone tel2" autocomplete="off" placeholder="5XX XXX XX XX"></div>
                 </div>
                 <div class="row form-group">
                   <div class="col-md-4 rw1"><label>İl/İlçe <span style="font-weight: bold; color: red;">*</span></label></div>
                   <div class="col-md-4 col-6 custom-p-r-m-md rw2">
                     <select class="form-control form-select il" name="il" id="countrySelect" required>
-                      <option value="">-SEÇİNİZ-</option>
-                      @foreach($iller as $il)
-                        <option value="{{ $il->id }}" {{ $il->id == 34 ? 'selected' : '' }}>{{ $il->name }}</option>
-                      @endforeach
+                        <option value="">-SEÇİNİZ-</option>
+                        @foreach($iller as $il)
+                            <option value="{{ $il->id }}">{{ $il->name }}</option>
+                        @endforeach
                     </select>
                   </div>
                   <div class="col-md-4 col-6 custom-p-m-md rw2">

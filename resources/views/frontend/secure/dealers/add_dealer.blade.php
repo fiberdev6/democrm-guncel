@@ -36,7 +36,7 @@
   <div class="row">
     <label class="col-sm-4 custom-p-r">Telefon<span style="font-weight: bold; color: red;">*</span></label>
     <div class="col-sm-8 custom-p-l">
-      <input name="tel" id="tel" class="form-control phone" type="text" required>
+      <input name="tel" id="tel" class="form-control phone" type="text" placeholder="5XX XXX XX XX" required>
     </div>
   </div>
 
