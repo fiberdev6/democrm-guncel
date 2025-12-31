@@ -111,7 +111,9 @@
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
             <label class="col-sm-4 col-form-label"></label>
             <div class="col-sm-8">
-              <img class="img-thumbnail" id="showImage" width="180" src="{{ asset($firma->logo) }}" data-holder-rendered="true">
+              <img class="img-thumbnail" id="showImage" width="180" 
+     src="{{ $firma->logo ? asset($firma->logo) : asset('frontend/img/no-image.jpg') }}" 
+     data-holder-rendered="true">
             </div>
           </div>
           <!-- end row -->

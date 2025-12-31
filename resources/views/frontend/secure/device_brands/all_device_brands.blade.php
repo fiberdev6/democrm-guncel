@@ -33,6 +33,12 @@
               @endforeach
             </tbody>
         </table>
+
+        @if($device_brands->count() > 0)
+        <div class="text-muted mt-2" style="font-size: 13px;">
+             Toplam: <strong>{{ $device_brands->count() }}</strong> 
+        </div>
+        @endif
     </div>
 
     <div class="d-lg-none">
@@ -178,6 +184,17 @@
         });
       }
     });
+  });
+
+  $('#datatableDeviceBrand').DataTable({
+      paging: false,       // Sayfalama kapalı
+      searching: false,    // Arama kutusu kapalı
+      info: false,         // "Kayıt yok" bilgisi kapalı
+      lengthChange: false, // "10 kayıt göster" kapalı
+      ordering: true,      // Sıralama açık kalabilir (istersen false yap)
+      language: {
+          emptyTable: "Tabloda herhangi bir veri mevcut değil"
+      }
   });
   </script>
   

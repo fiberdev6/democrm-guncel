@@ -166,22 +166,19 @@
              <div class="credentials-box">
                 <h4>🔐 Giriş Bilgileriniz</h4>
                 
-                <div class="credential-item">
-                    <strong>Kullanıcı Adı</strong>
-                    <div class="credential-value">{{ $mailData['username'] ?? 'Belirsiz' }}</div>
-                </div>
+                <p style="margin: 10px 0;">
+                    <strong>Kullanıcı Adı:</strong> {{ $mailData['username'] ?? 'Belirsiz' }}
+                </p>
 
                 @if(isset($mailData['firma_kodu']) && $mailData['firma_kodu'])
-                <div class="credential-item">
-                    <strong>Firma Kodu</strong>
-                    <div class="credential-value">{{ $mailData['firma_kodu'] }}</div>
-                </div>
+                <p style="margin: 10px 0;">
+                    <strong>Firma Kodu:</strong> {{ $mailData['firma_kodu'] }}
+                </p>
                 @endif
 
-                <div class="credential-item">
-                    <strong>Şifre</strong>
-                    <div class="credential-value">Kayıt sırasında belirlediğiniz şifre</div>
-                </div>
+                <p style="margin: 10px 0;">
+                    <strong>Şifre:</strong> Kayıt sırasında belirlediğiniz şifre
+                </p>
 
                 <p style="font-size: 13px; color: #6c757d; margin-top: 15px; font-style: italic;">
                     💡 Güvenliğiniz için şifrenizi kimseyle paylaşmayın.
@@ -221,7 +218,7 @@
                             @elseif($mailData['tenant']->bayiSayisi)
                                 {{ $mailData['tenant']->bayiSayisi }}
                             @else
-                                Belirsiz
+                                Pasif
                             @endif
                         </li>
                         <li>

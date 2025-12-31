@@ -18,10 +18,16 @@ use App\Services\InvoiceIntegrationFactory;
 use Illuminate\Support\Facades\Cache;
 use App\Services\VerimorSantralService;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\StoreCustomerRequest;
 
 
 class CustomerController extends Controller
 {
+    public function __construct()
+{
+    $this->middleware('permission:Müşterileri Görebilir');
+}
+
     public function AllCustomer($tenant_id, Request $request) {
         // Firma bilgisi
         $firma = Tenant::where('id', $tenant_id)->first();
@@ -180,7 +186,7 @@ class CustomerController extends Controller
         return view('frontend.secure.customers.add_customer', compact('countries','firma','hasInvoiceIntegration'));
     }
 
-    public function StoreCustomer($tenant_id, Request $request) {
+    public function StoreCustomer($tenant_id, StoreCustomerRequest $request) {
 
         $token = $request->input('form_token');
         // Token boş mu kontrol et
@@ -350,7 +356,7 @@ class CustomerController extends Controller
         return view('frontend.secure.customers.edit_customer', compact('customer','countries','firma'));
     }
 
-    public function UpdateCustomer($tenant_id, $id, Request $request){
+    public function UpdateCustomer($tenant_id, $id, StoreCustomerRequest $request){
         $firma = Tenant::where('id', $tenant_id)->first();
         if(!$firma) {
             $notification = array(

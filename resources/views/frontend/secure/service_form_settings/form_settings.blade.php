@@ -1,4 +1,13 @@
 
+ <div class="row mt-3 mb-2">
+  <div class="col-12">
+    <div class=" d-sm-flex align-items-center justify-content-center">
+      <h4 class="mb-sm-0 fw-bold text-gray  pb-2" style="font-size: 19px;">Servis Form Ayarları</h4>
+    </div>
+  </div>
+</div>       
+        <div class="d-flex justify-content-center align-items-center w-100">
+
         <form id="serviceFormSettings" method="post" action="{{ route('update.service.form.settings',$firma->id)}}" enctype="multipart/form-data" class="needs-validation" novalidate style="width: 50%;">
           @csrf
           <input type="hidden" name="id" value="{{ $ayar->id ?? '' }}">
@@ -12,13 +21,14 @@
           </div>
           <!-- end row -->
 
-          <div class="row">
-            <label class="col-sm-4 col-form-label d-none"></label>
-            <div class="col-sm-8">
+          <div class="row align-items-center">
+            <div class="col-12 text-center">
               <input type="submit" class="btn btn-info waves-effect waves-light" value="Kaydet">
             </div>
           </div>
         </form>
+        </div>
+        </div>
 <script>
   $(document).ready(function () {
     $('#serviceFormSettings').submit(function (event) {

@@ -1,6 +1,8 @@
 
 <form method="post" id="editPers" action="{{ route('update.personel', [$firma->id, $staff->user_id]) }}" enctype="multipart/form-data">
     @csrf
+
+    
     <div class="row">
       <label class="col-sm-4 custom-p-r">Başlama Tarihi<span style="font-weight: bold; color: red;">*</span></label>
       <div class="col-sm-8 custom-p-l">

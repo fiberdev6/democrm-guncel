@@ -2,36 +2,54 @@
 $user = Auth::user();
 @endphp
 <header id="page-topbar">
-  <div class="mobile-top-logo d-block d-md-none text-center py-2">
-    @if(!empty($user->tenant->firma_adi))
-        {{ $user->tenant->firma_adi }}
-    @else 
-        Yönetim Paneli
-    @endif
-</div>
+  <div class="mobile-top-logo d-block d-sm-none text-center py-2">
+        @if(!empty($user->tenant->firma_adi))
+            <div class="d-flex flex-column justify-content-center" style="line-height: 1.2;">
+                <div style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ $user->tenant->firma_adi }}
+                </div>
+                @if(!empty($user->tenant->firma_kodu))
+                    <div style="font-size: 11px; letter-spacing: 0.5px; margin-top: -2px;">
+                        <span style="color: #fff; font-weight: 500;">Firma Kodu:</span>
+                        <span style="color: #f27c22; font-weight: 600;">{{ $user->tenant->firma_kodu }}</span>
+                    </div>
+                @endif
+            </div>
+        @else 
+            Yönetim Paneli
+        @endif
+    </div>
     <div class="navbar-header">
       <div class="d-flex">
         <button type="button" class="btn btn-sm px-3 font-size-24 header-item" id="vertical-menu-btn">
           <i class="ri-menu-2-line align-middle"></i>
         </button>
-        <div class="navbar-brand-box">
-            @if($user->hasRole('Super Admin'))
-                <a href="{{ route('super.admin.dashboard') }}" class="logo logo-light">
-            @else
-                <a href="{{ route('secure.home', $user->tenant_id) }}" class="logo logo-light">
-            @endif
-                <span class="logo-lg">
-                    @if(!empty($user->tenant->firma_adi))
-                        {{$user->tenant->firma_adi}}
-                    @else 
-                        Yönetim Paneli
-                    @endif
-                </span>
-                
-            </a>
-        </div>
+        <div class="navbar-brand-box d-none d-md-inline-block">
+                @php
+                    $dashboardRoute = $user->hasRole('Super Admin') 
+                                      ? route('super.admin.dashboard') 
+                                      : route('secure.home', $user->tenant_id);
+                @endphp
 
-      </div>
+                <a href="{{ $dashboardRoute }}" class="logo logo-light d-flex align-items-center" style="text-decoration: none;">
+                    <div class="d-flex flex-column justify-content-center" style="line-height: 1.1; min-height: 70px;">
+                        @if(!empty($user->tenant->firma_adi))
+                            <span style="font-size: 15px; font-weight: 600; color: #fff; display: block;">
+                                {{ $user->tenant->firma_adi }}
+                            </span>
+                            @if(!empty($user->tenant->firma_kodu))
+                                <span style="font-size: 12px; letter-spacing: 0.8px; display: block; margin-top: 2px;">
+                                    <span style="color: #fff; font-weight: 500;">Firma Kodu:</span>
+                                    <span style="color: #f27c22; font-weight: 700;">{{ $user->tenant->firma_kodu }}</span>
+                                </span>
+                            @endif
+                        @else 
+                            <span style="font-size: 16px; font-weight: 600; color: #fff;">Yönetim Paneli</span>
+                        @endif
+                    </div>
+                </a>
+            </div>
+        </div>
   
       <div class="d-flex">
   

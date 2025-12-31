@@ -18,9 +18,17 @@ class ServiceReportsController extends Controller
         $teknisyen = User::role(['Teknisyen'])->where('tenant_id', $tenant_id)->get();
         $yardimciTeknisyen = User::role(['Teknisyen Yardımcısı'])->where('tenant_id', $tenant_id)->get();
         $cars = Car::where('firma_id', $tenant_id)->where('durum', '1')->get();
-        $marka = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $marka = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('marka', 'asc')->get();
         $servisKaynak = ServiceResource::where('firma_id',$tenant_id)->get();
         return view('frontend.secure.all_services.service_reports.reports_modal', compact('firma','operators','teknisyen','yardimciTeknisyen','cars','marka','servisKaynak'));

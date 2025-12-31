@@ -132,15 +132,31 @@
             $('#addCashTransactionsModal').modal('hide');
           },
           error: function(xhr, status, error) {
-            if (xhr.status === 422) {
+                    if (xhr.status === 422) {
                         var response = JSON.parse(xhr.responseText);
+                        
+                        // Genel hata
                         if (response.error) {
-                            $('#servisHata').text(response.error); // ❗Hata yaz
+                            alert(response.error);
+                            return;
                         }
+                        
+                        // Validation hataları
+                        if (response.errors) {
+                            $.each(response.errors, function(field, messages) {
+                                var input = $('[name="' + field + '"]');
+                                input.addClass('is-invalid');
+                                input.after('<div class="invalid-feedback" style="display:block;">' + messages[0] + '</div>');
+                            });
+                            $('.is-invalid').first().focus();
+                        }
+                    } else if (xhr.status === 403 || xhr.status === 429) {
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.error || 'Bir hata oluştu.');
                     } else {
-                        console.error(xhr.responseText);
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
                     }
-          }
+                }
         });
       }
     });

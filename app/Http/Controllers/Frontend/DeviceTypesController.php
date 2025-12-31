@@ -19,10 +19,18 @@ class DeviceTypesController extends Controller
             );
             return redirect()->route('giris')->with($notification);
         }
-        $device_types = DeviceType::where(function($query) use ($firma) {
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_types = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('cihaz', 'asc')->get();
         return view('frontend.secure.device_types.all_device_types', compact('firma','device_types'));
     }
 

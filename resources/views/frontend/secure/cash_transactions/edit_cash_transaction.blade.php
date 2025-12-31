@@ -214,9 +214,26 @@ $(document).ready(function (e) {
         }
       },
       error: function (xhr, status, error) {
-        alert("Güncelleme başarısız!");
-        window.location.reload(true);
-      },
+                if (xhr.status === 422) {
+                    var response = JSON.parse(xhr.responseText);
+                    
+                    if (response.error) {
+                        alert(response.error);
+                        return;
+                    }
+                    
+                    if (response.errors) {
+                        $.each(response.errors, function(field, messages) {
+                            var input = $('[name="' + field + '"]');
+                            input.addClass('is-invalid');
+                            input.after('<div class="invalid-feedback" style="display:block;">' + messages[0] + '</div>');
+                        });
+                        $('.is-invalid').first().focus();
+                    }
+                } else {
+                    alert("Güncelleme başarısız!");
+                }
+            },
     });
   });
 });

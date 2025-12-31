@@ -15,9 +15,16 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\PersonelRequest;
+use App\Http\Requests\BayiRequest;
 
 class PersonelController extends Controller
-{
+{   
+        public function __construct()
+    {
+        $this->middleware('permission:Personelleri Görebilir');
+    }
+
     public function AllStaffs($tenant_id, Request $request) {
         
         // Kullanıcı oturum kontrolü
@@ -169,7 +176,7 @@ class PersonelController extends Controller
         return $username . '@' . $domain; // Kullanıcı adı ve firma domainiyle yeni e-posta oluşturur
     }
 
-    public function StoreStaff(Request $request, $tenant_id) {
+    public function StoreStaff(PersonelRequest $request, $tenant_id) {
 
     $token = $request->input('form_token');
     if (empty($token)) {
@@ -347,7 +354,7 @@ public function checkUsernameAvailability(Request $request, $tenant_id)
         return view('frontend.secure.staffs.edit_staff', compact('staff','roles','firma','countries'));
     }
 
-    public function UpdateStaff(Request $request, $tenant_id, $id){
+    public function UpdateStaff(PersonelRequest $request, $tenant_id, $id){
     $firma = Tenant::where('id', $tenant_id)->first();
 
     if (!$firma) {
@@ -502,7 +509,7 @@ public function AddDealer($tenant_id) {
     return view('frontend.secure.dealers.add_dealer', compact('firma','roles', 'countries'));
 }
 
-public function StoreDealer(Request $request, $tenant_id)
+public function StoreDealer(BayiRequest $request, $tenant_id)
 {
     $token = $request->input('form_token');
     if (empty($token)) {
@@ -685,7 +692,7 @@ public function EditDealer($tenant_id, $id)
     return view('frontend.secure.dealers.edit_dealer', compact('firma', 'bayi', 'countries'));
 }
 
-public function UpdateDealer(Request $request, $tenant_id, $id)
+public function UpdateDealer(BayiRequest $request, $tenant_id, $id)
 {
     $firma = Tenant::findOrFail($tenant_id);
     $bayi = User::where('tenant_id', $tenant_id)

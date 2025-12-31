@@ -21,7 +21,11 @@ use Illuminate\Support\Facades\Log;
 use App\Services\ActivityLogger; 
 
 class BulkSmsController extends Controller
+{   
+    public function __construct()
 {
+    $this->middleware('role:Patron');
+}
     public function index($tenant_id)
     {   
         $firma = Tenant::where('id', $tenant_id)->first();
@@ -54,14 +58,28 @@ class BulkSmsController extends Controller
 
             }
 
-            $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
+            $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+            $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    // Beyaz eşya sektörü: default + kendi eklediği
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $firma->id);
+                } else {
+                    // Diğer sektörler: sadece kendi eklediği
+                    $query->where('firma_id', $firma->id);
+                }
             })->orderBy('cihaz', 'asc')->get();
 
-            $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
+            $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    // Beyaz eşya sektörü: default + kendi eklediği
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $firma->id);
+                } else {
+                    // Diğer sektörler: sadece kendi eklediği
+                    $query->where('firma_id', $firma->id);
+                }
             })->orderBy('marka', 'asc')->get();
 
             $servisKaynaklari = ServiceResource::where('firma_id', $tenant_id)

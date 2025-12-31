@@ -19,10 +19,18 @@ class DeviceBrandsController extends Controller
             );
             return redirect()->route('giris')->with($notification);
         }
-        $device_brands = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+                        if ($isBeyazEsya) {
+                            // Beyaz eşya sektörü: default + kendi eklediği
+                            $query->whereNull('firma_id')
+                                ->orWhere('firma_id', $firma->id);
+                        } else {
+                            // Diğer sektörler: sadece kendi eklediği
+                            $query->where('firma_id', $firma->id);
+                        }
+                    })->orderBy('marka', 'asc')->get();
         return view('frontend.secure.device_brands.all_device_brands', compact('firma','device_brands'));
     }
 

@@ -7,6 +7,18 @@
   <div id="tab1" class="tab-pane active" style="padding: 0">
     <form method="post" id="editCust" class="editCust" action="{{ route('update.customer', [$firma->id, $customer->id]) }}" enctype="multipart/form-data">
       @csrf
+
+      @if ($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="fas fa-exclamation-triangle"></i> Hata!</strong>
+          <ul class="mb-0 mt-2">
+              @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+              @endforeach
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      @endif
       <div class="row">
         <label class="col-sm-3 custom-p-r">Kayıt Tarihi<span style="font-weight: bold; color: red;">*</span></label>
         <div class="col-sm-9 custom-p-l">
@@ -217,10 +229,27 @@
             
           }
         },
-        error: function (xhr, status, error) {
-          alert("Güncelleme başarısız!");
-          window.location.reload(true);
-        },
+         error: function (xhr, status, error) {
+                if (xhr.status === 422) {
+                    var response = JSON.parse(xhr.responseText);
+                    
+                    if (response.error) {
+                        alert(response.error);
+                        return;
+                    }
+                    
+                    if (response.errors) {
+                        $.each(response.errors, function(field, messages) {
+                            var input = $('[name="' + field + '"]');
+                            input.addClass('is-invalid');
+                            input.after('<div class="invalid-feedback" style="display:block;">' + messages[0] + '</div>');
+                        });
+                        $('.is-invalid').first().focus();
+                    }
+                } else {
+                    alert("Güncelleme başarısız!");
+                }
+            },
       });
     });
   });

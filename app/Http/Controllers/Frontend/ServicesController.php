@@ -65,14 +65,28 @@ class ServicesController extends Controller
             return redirect()->route('giris')->with($notification);
         }
         //$services         = Service::where('firma_id', $firma->id)->get();
-        $device_brands    = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
-        })->orderBy('marka', 'asc')->get();
-        $device_types     = DeviceType::where(function($query) use ($firma) {
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands    = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('marka', 'asc')->get();
+        $device_types     = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('cihaz', 'asc')->get();
         $service_stages   = ServiceStage::where(function ($q) use ($tenant_id) {
                                 $q->whereNull('firma_id')->orWhere('firma_id', $tenant_id);
                             })->orderBy('asama', 'asc')->get();
@@ -928,14 +942,29 @@ private function getYetkiliServisIDleri($user, $tenant_id)
         $firma = Tenant::where('id', $tenant_id)->first();
         $service_resources = ServiceResource::where('firma_id', $firma->id)->orderBy('kaynak', 'asc')->get();
         $iller = DB::table('ils')->orderBy('name', 'ASC')->get();
-        $device_brands = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('marka', 'asc')->get();
 
-        $device_types = DeviceType::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+        $device_types = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('cihaz', 'asc')->get();
         $warranty_periods = WarrantyPeriod::orderBy('garanti', 'asc')->get();
         $hasInvoiceIntegration = InvoiceIntegrationFactory::hasIntegration($tenant_id);
@@ -1203,14 +1232,29 @@ private function getYetkiliServisIDleri($user, $tenant_id)
     ])->where('firma_id', $firma->id)->findOrFail($id);
         $service_resources = ServiceResource::where('firma_id', $firma->id)->orderBy('kaynak', 'asc')->get();
         $iller = DB::table('ils')->orderBy('name', 'ASC')->get();
-        $device_brands = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('marka', 'asc')->get();
 
-        $device_types = DeviceType::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+        $device_types = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('cihaz', 'asc')->get();
         $warranty_periods = WarrantyPeriod::orderBy('garanti', 'asc')->get();
         
@@ -2986,17 +3030,28 @@ private function konsinyeKullan($stokId, $adet, $servisId, $planId, $tenantId)
         
         // İlgili tabloların bilgilerini al
         $musteri = Customer::where('firma_id', $tenant_id)->where('id', $servis->musteri_id)->first();
+        $firma = Tenant::find($tenant_id);
+        $isBeyazEsya = $firma && $firma->sektor === 'beyaz-esya';
+
         $cihazMarka = DeviceBrand::where('id', $servis->cihazMarka)
-            ->where(function($query) use ($tenant_id) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $tenant_id);
+            ->where(function($query) use ($tenant_id, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $tenant_id);
+                } else {
+                    $query->where('firma_id', $tenant_id);
+                }
             })
             ->first();
 
         $cihazTur = DeviceType::where('id', $servis->cihazTur)
-            ->where(function($query) use ($tenant_id) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $tenant_id);
+            ->where(function($query) use ($tenant_id, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $tenant_id);
+                } else {
+                    $query->where('firma_id', $tenant_id);
+                }
             })
             ->first();
         $servisDurum = ServiceStage::where(function ($query) use ($tenant_id) {

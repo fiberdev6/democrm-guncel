@@ -6,22 +6,27 @@
         <input type="hidden" name="planid" value="{{ $servisPlan->id }}">
         <input type="hidden" name="tenant_id" value="{{ $tenant_id }}">
 
-        {{-- İşlemi Yapan Personel Seçimi --}}
-        <div class="row form-group">
-          <div class="col-lg-12">
-            <label>İşlemi Yapan</label>
+        {{-- İşlemi Yapan Personel Seçimi - Sadece Patron Görebilir --}}
+        @if(auth()->user()->hasRole('Patron'))
+          <div class="row form-group">
+            <div class="col-lg-12">
+              <label>İşlemi Yapan</label>
+            </div>
+            <div class="col-lg-12">
+              <select name="planIslemiYapan" class="form-control planIslemiYapan">
+                @foreach($personellerAll as $personel)
+                  <option value="{{ $personel->user_id }}" 
+                    {{ $personel->user_id == $servisPlan->pid ? 'selected' : '' }}>
+                    {{ $personel->name }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
           </div>
-          <div class="col-lg-12">
-            <select name="planIslemiYapan" class="form-control planIslemiYapan">
-              @foreach($personellerAll as $personel)
-                <option value="{{ $personel->user_id }}" 
-                  {{ $personel->user_id == $servisPlan->pid ? 'selected' : '' }}>
-                  {{ $personel->name }}
-                </option>
-              @endforeach
-            </select>
-          </div>
-        </div>
+        @else
+          {{-- Patron değilse mevcut değeri hidden olarak gönder --}}
+          <input type="hidden" name="planIslemiYapan" value="{{ $servisPlan->pid }}">
+        @endif
                 
         {{-- Plan Cevapları --}}
         @foreach($planCevaplar as $plan)
