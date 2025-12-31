@@ -31,6 +31,8 @@
     <!--select 2-->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 
 
@@ -355,8 +357,7 @@ $(document).ready(function() {
     <script src="{{ asset('backend/assets/js/pages/datatables.init.js') }}"></script>
 
     <!-- sweetalert2 js -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('backend/assets/js/code.js') }}"></script>
 
     <script src="{{asset('backend/assets/libs/dropzone/min/dropzone.min.js')}}"></script>

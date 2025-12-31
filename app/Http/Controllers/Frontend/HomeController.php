@@ -167,7 +167,14 @@ $hero = HomepageContent::getSection('hero');
                         'title' => 'Adres',
                         'info' => 'İstanbul, Türkiye'
                     ]
-                ]
+                    ],
+                    // MOBİL MENÜ
+                    'mobile_menu' => [
+                        'phone' => '02129092861',      // Arama için (boşluksuz)
+                        'phone_display' => '0212 909 2861',  // Gösterim
+                        'whatsapp' => '905551234567',  // WhatsApp için (başında 90)
+                        'email' => 'info@serbis.com'
+                    ]
             ];
         }
 
@@ -191,8 +198,45 @@ $hero = HomepageContent::getSection('hero');
         // // Footer Content
         // $footerContent = HomepageContent::getSection('footer_content');
 
+            
+    // ==========================================
+    // META TAGS - ANA SAYFA
+    // ==========================================
+    $metaTags = HomepageContent::where('section', 'meta_tags_home')
+                               ->where('is_active', true)
+                               ->first();
+    
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Serbis - Teknik Servis Yönetim Sistemi | Bulut Tabanlı CRM Yazılımı',
+                'description' => 'Teknik servis işletmenizi dijitalleştirin! Müşteri takibi, servis yönetimi, stok kontrolü ve cari hesap işlemlerini tek platformdan yönetin. 14 gün ücretsiz deneyin.',
+                'keywords' => 'teknik servis yazılımı, servis yönetim sistemi, teknik servis crm, bulut tabanlı servis programı',
+                'og_title' => 'Serbis - Teknik Servis İşletmenizi Dijitalleştirin',
+                'og_description' => 'Müşteri, servis, stok ve personel yönetimini tek platformdan kontrol edin. Mobil uyumlu, kullanımı kolay, güvenli.',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Serbis - Teknik Servis Yönetim Sistemi',
+                'twitter_description' => 'Teknik servis süreçlerinizi dijitalleştirin. 14 gün ücretsiz deneme!'
+            ]
+        ];
+    }
 
-        return view('frontend.index', compact('stats', 'modules', 'sectors', 'integrations', 'testimonials', 'faqs', 'hero', 'sectionHeaders', 'contact', 'cta', 'video',));
+// Google Tags içeriğini iki parçaya ayırın
+$googleTags = HomepageContent::getSection('google_tags');
+
+// Eğer yoksa varsayılan yapı
+if(!$googleTags) {
+    $googleTags = (object)[
+        'content' => [
+            'analytics_code' => '',
+            'tag_manager_head' => '',
+            'tag_manager_body' => ''
+        ]
+    ];
+}
+
+
+        return view('frontend.index', compact('stats', 'modules', 'sectors', 'integrations', 'testimonials', 'faqs', 'hero', 'sectionHeaders', 'contact', 'cta', 'video', 'metaTags', 'googleTags'));
     }
 
 
@@ -200,7 +244,27 @@ public function Sectors()
 {
     $sectorsContent = HomepageContent::getSection('sectors_content');
     
-    return view('frontend.frontend_pages.sectors', compact('sectorsContent'));
+        // Meta Tags - Sektörler
+    $metaTags = HomepageContent::where('section', 'meta_tags_sectors')
+                               ->where('is_active', true)
+                               ->first();
+    
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Sektörler - Beyaz Eşya, Elektronik, Klima | Serbis',
+                'description' => 'Beyaz eşya, elektronik, klima, kombi ve daha fazla sektör için özel teknik servis çözümleri.',
+                'keywords' => 'beyaz eşya servis, elektronik servis, klima servisi, kombi servisi',
+                'og_title' => 'Tüm Sektörler İçin Özel Çözümler',
+                'og_description' => 'Sektörünüze özel modüller ve entegrasyonlar',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Sektörler - Serbis',
+                'twitter_description' => 'Tüm sektörler için özel çözümler'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.sectors', compact('sectorsContent', 'metaTags'));
 }
 public function SectorDetail($slug)
 {
@@ -215,9 +279,35 @@ public function SectorDetail($slug)
         // Database'de yoksa 404
         abort(404);
     }
+    // ==========================================
+    // META TAGS - SEKTÖR DETAY
+    // ==========================================
+    $metaSection = 'meta_tags_sector_' . $slug;
+    $metaTags = HomepageContent::where('section', $metaSection)
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.sector_detail', compact('sector'));
+    if (!$metaTags) {
+        // Varsayılan meta tags (fallback)
+        $sectorName = $sector['title'] ?? 'Sektör';
+        
+        $metaTags = (object)[
+            'content' => [
+                'title' => $sectorName . ' Teknik Servisi İçin Yazılım | Serbis',
+                'description' => $sectorName . ' teknik servislerine özel çözüm. Müşteri takibi, servis yönetimi, stok kontrolü ve daha fazlası.',
+                'keywords' => $sectorName . ' servisi, ' . $sectorName . ' teknik servis programı, ' . $sectorName . ' yazılımı',
+                'og_title' => $sectorName . ' Teknik Servisi Çözümleri - Serbis',
+                'og_description' => $sectorName . ' servislerine özel modüller ve entegrasyonlar.',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => $sectorName . ' Teknik Servisi - Serbis',
+                'twitter_description' => $sectorName . ' servisleri için özel çözüm'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.sector_detail', compact('sector', 'metaTags'));
 }
+
 public function legalPage($slug)
 {
     $page = HomepageContent::where('section', $slug)->where('is_active', true)->first();
@@ -228,11 +318,32 @@ public function legalPage($slug)
     
     return view('frontend.frontend_pages.legal_page', compact('page'));
 }
- public function Features()
+public function Features()
 {
+    // Mevcut features content
     $featuresContent = HomepageContent::getSection('features_content');
     
-    return view('frontend.frontend_pages.features', compact('featuresContent'));
+    // Meta Tags - Özellikler
+    $metaTags = HomepageContent::where('section', 'meta_tags_features')
+                               ->where('is_active', true)
+                               ->first();
+    
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Özellikler - Serbis\'in Sunduğu Tüm Modüller',
+                'description' => 'Müşteri yönetimi, servis takibi, stok kontrolü, cari hesap, SMS entegrasyonu, raporlama ve 20+ özellik.',
+                'keywords' => 'teknik servis özellikleri, servis modülleri, stok takibi, müşteri yönetimi',
+                'og_title' => 'Özellikler - Serbis',
+                'og_description' => '20+ modül ile eksiksiz teknik servis yönetimi',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Özellikler - Serbis',
+                'twitter_description' => '20+ modül ile eksiksiz teknik servis yönetimi'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.features', compact('featuresContent', 'metaTags'));
 }
 
 public function FeatureDetail($slug)
@@ -248,9 +359,35 @@ public function FeatureDetail($slug)
         // Database'de yoksa 404
         abort(404);
     }
+    // ==========================================
+    // META TAGS - ÖZELLİK DETAY
+    // ==========================================
+    $metaSection = 'meta_tags_feature_' . $slug;
+    $metaTags = HomepageContent::where('section', $metaSection)
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.feature_detail', compact('feature'));
+    if (!$metaTags) {
+        // Varsayılan meta tags (fallback)
+        $featureName = $feature['title'] ?? 'Özellik';
+        
+        $metaTags = (object)[
+            'content' => [
+                'title' => $featureName . ' Modülü - Serbis Teknik Servis Yazılımı',
+                'description' => $featureName . ' ile teknik servis süreçlerinizi dijitalleştirin. ' . ($feature['subtitle'] ?? ''),
+                'keywords' => $featureName . ', teknik servis ' . strtolower($featureName) . ', servis yönetimi',
+                'og_title' => $featureName . ' - Serbis',
+                'og_description' => $feature['description'] ?? $featureName . ' modülü ile işlerinizi kolaylaştırın.',
+                'og_image' => $feature['hero_image'] ?? 'frontend/img/anasayfa2.png',
+                'twitter_title' => $featureName . ' - Serbis',
+                'twitter_description' => $featureName . ' modülü'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.feature_detail', compact('feature', 'metaTags'));
 }
+
 // public function FeatureDetail($slug)
 // {
 //     $featureDetails = [
@@ -552,15 +689,53 @@ public function Integrations()
             'faqs' => []
         ];
     }
+    // Meta Tags - Entegrasyonlar
+    $metaTags = HomepageContent::where('section', 'meta_tags_integrations')
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.integrations', compact('integrationsContent'));
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Entegrasyonlar - SMS, VoIP, Muhasebe | Serbis',
+                'description' => 'SMS, VoIP, muhasebe programları ve daha fazla entegrasyon.',
+                'keywords' => 'sms entegrasyonu, voip entegrasyon, muhasebe entegrasyonu',
+                'og_title' => 'Entegrasyonlar - Serbis',
+                'og_description' => '20+ entegrasyon ile iş süreçlerinizi otomatikleştirin',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Entegrasyonlar - Serbis',
+                'twitter_description' => '20+ entegrasyon ile otomatik süreçler'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.integrations', compact('integrationsContent', 'metaTags'));
 }
 
 public function About()
 {
     $aboutContent = HomepageContent::getSection('about-content');
+        // Meta Tags - Hakkımızda
+    $metaTags = HomepageContent::where('section', 'meta_tags_about')
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.about', compact('aboutContent'));
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Hakkımızda - Serbis Teknik Servis Yazılımı',
+                'description' => 'Serbis, Türkiye\'nin en çok tercih edilen teknik servis yönetim yazılımıdır. 1000+ mutlu müşteri, 5 yıllık tecrübe.',
+                'keywords' => 'serbis hakkında, teknik servis yazılım şirketi, referanslar',
+                'og_title' => 'Hakkımızda - Serbis',
+                'og_description' => 'Türkiye\'nin lider teknik servis yönetim platformu',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Hakkımızda - Serbis',
+                'twitter_description' => 'Türkiye\'nin lider teknik servis yönetim platformu'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.about', compact('aboutContent', 'metaTags'));
 }
 
 public function Pricing()
@@ -593,9 +768,29 @@ public function Pricing()
             ]
         ];
     }
+    // Meta Tags - Fiyatlandırma
+    $metaTags = HomepageContent::where('section', 'meta_tags_pricing')
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.pricing', compact('pricingContent'));
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'Fiyatlandırma - Serbis Uygun Fiyatlı Paketler',
+                'description' => '199 TL\'den başlayan paketler. 14 gün ücretsiz deneme, kredi kartı gerektirmez.',
+                'keywords' => 'teknik servis yazılım fiyat, servis programı ücret, paket fiyatları',
+                'og_title' => 'Fiyatlandırma - 14 Gün Ücretsiz Dene',
+                'og_description' => '199 TL\'den başlayan esnek paketler.',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'Fiyatlandırma - Serbis',
+                'twitter_description' => '199 TL\'den başlayan esnek paketler'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.pricing', compact('pricingContent', 'metaTags'));
 }
+    
 public function Contact()
 {
     // Database'den iletişim içeriğini al
@@ -638,12 +833,41 @@ public function Contact()
             ]
         ];
     }
+    // Meta Tags - İletişim
+    $metaTags = HomepageContent::where('section', 'meta_tags_contact')
+                               ->where('is_active', true)
+                               ->first();
     
-    return view('frontend.frontend_pages.contact', compact('contactContent'));
+    if (!$metaTags) {
+        $metaTags = (object)[
+            'content' => [
+                'title' => 'İletişim - Serbis Destek Ekibi | 7/24 Destek',
+                'description' => 'Sorularınız için bizimle iletişime geçin. Hızlı ve profesyonel çözüm.',
+                'keywords' => 'serbis iletişim, teknik destek, müşteri hizmetleri',
+                'og_title' => 'İletişim - Bize Ulaşın',
+                'og_description' => '7/24 profesyonel destek ekibi',
+                'og_image' => 'frontend/img/anasayfa2.png',
+                'twitter_title' => 'İletişim - Serbis',
+                'twitter_description' => '7/24 profesyonel destek ekibi'
+            ]
+        ];
+    }
+    
+    return view('frontend.frontend_pages.contact', compact('contactContent', 'metaTags'));
 }
 
 public function ContactSubmit(Request $request)
 {
+    // Rate limit kontrolü - dakikada 5 deneme
+    $key = 'contact-form:' . $request->ip();
+    
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+        return back()->with('error', 'Çok fazla mesaj gönderdiniz. Lütfen ' . $seconds . ' saniye sonra tekrar deneyin.');
+    }
+    
+    \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email',
@@ -667,7 +891,7 @@ public function ContactSubmit(Request $request)
         ];
 
         // Mail gönder
-        Mail::to('serbiscrmyazilimi@gmail.com')->send(new ContactFormMail($data));
+        Mail::to('fiberdev6@gmail.com')->send(new ContactFormMail($data));
 
         // Başarılı mesajı
         return back()->with('success', 'Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapılacaktır.');
@@ -1028,6 +1252,20 @@ public function RegisterAction(Request $request)
 
     public function verifySmsCode(Request $request) 
 {
+    // Rate limit kontrolü - dakikada 5 deneme
+    $key = 'sms-verify:' . $request->ip();
+    
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 5)) {
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Çok fazla deneme yaptınız. Lütfen ' . $seconds . ' saniye sonra tekrar deneyin.'
+        ], 429);
+    }
+    
+    \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+
     $request->validate([
         'code' => 'required|numeric|digits:6'
     ], [
@@ -1544,6 +1782,21 @@ public function getDistricts(Request $request)
     // Şifre sıfırlama e-postası gönderme
 public function sendResetLinkEmail(Request $request)
 {
+    // Rate limit kontrolü - dakikada 3 deneme
+    $key = 'password-reset:' . $request->ip();
+    
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($key);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Çok fazla deneme yaptınız. Lütfen ' . $seconds . ' saniye sonra tekrar deneyin.'
+        ], 429);
+    }
+    
+    \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+
+
     $request->validate([
         'email' => 'required|email|exists:tenants,eposta',
     ], [
@@ -2130,5 +2383,6 @@ private function getStockAlerts($tenant_id)
         return response()->json($cities);
     }
 
+    
     
 }

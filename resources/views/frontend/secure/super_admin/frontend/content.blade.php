@@ -35,6 +35,16 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#meta" role="tab">
+                                    <i class="fas fa-tags me-1"></i> Meta Tags (SEO)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#google_tags" role="tab">
+                                    <i class="fab fa-google me-1"></i> Google Tags
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#contact" role="tab">
                                     <i class="fas fa-address-card me-1"></i> İletişim
                                 </a>
@@ -315,6 +325,258 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Meta Tags Tab -->
+                            <div class="tab-pane" id="meta" role="tabpanel">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-tags me-2"></i> Sayfa Meta Tags Yönetimi (SEO)
+                                </h5>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Her sayfa için ayrı meta tags tanımlayabilirsiniz. Sosyal medyada paylaşıldığında bu bilgiler görünecektir.
+                                </div>
+                                
+                                <!-- SAYFA SEÇİMİ -->
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-file me-1"></i> Düzenlemek İstediğiniz Sayfayı Seçin:
+                                        </label>
+                                        <select id="meta_page_select" class="form-select form-select-lg">
+                                            <optgroup label="📄 ANA SAYFALAR">
+                                                <option value="meta_tags_home">🏠 Ana Sayfa</option>
+                                                <option value="meta_tags_about">ℹ️ Hakkımızda</option>
+                                                <option value="meta_tags_features">⚡ Özellikler (Genel)</option>
+                                                <option value="meta_tags_pricing">💰 Fiyatlandırma</option>
+                                                <option value="meta_tags_sectors">🏭 Sektörler (Genel)</option>
+                                                <option value="meta_tags_integrations">🔗 Entegrasyonlar</option>
+                                                <option value="meta_tags_contact">📞 İletişim</option>
+                                            </optgroup>
+                                            
+                                            @php
+                                                // SEKTÖR DETAYLARINI ÇEK (sectors_content hariç)
+                                                $sectors = App\Models\HomepageContent::where('section', 'LIKE', 'sector_%')
+                                                        ->where('section', '!=', 'sectors_content')
+                                                        ->where('is_active', true)
+                                                        ->orderBy('created_at')
+                                                        ->get();
+                                            @endphp
+                                            
+                                            @if($sectors->count() > 0)
+                                            <optgroup label="🏭 SEKTÖR DETAYLARI">
+                                                @foreach($sectors as $sector)
+                                                    @php
+                                                        $content = $sector->content;
+                                                        $sectorName = $content['title'] ?? 'İsimsiz Sektör';
+                                                        $slug = str_replace('sector_', '', $sector->section);
+                                                        $metaSection = 'meta_tags_sector_' . $slug;
+                                                    @endphp
+                                                    <option value="{{ $metaSection }}">🏭 {{ $sectorName }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                            @endif
+                                            
+                                            @php
+                                                // ÖZELLİK DETAYLARINI ÇEK (features_content hariç)
+                                                $features = App\Models\HomepageContent::where('section', 'LIKE', 'feature_%')
+                                                            ->where('section', '!=', 'features_content')
+                                                            ->where('is_active', true)
+                                                            ->orderBy('created_at')
+                                                            ->get();
+                                            @endphp
+                                            
+                                            @if($features->count() > 0)
+                                            <optgroup label="⚡ ÖZELLİK DETAYLARI">
+                                                @foreach($features as $feature)
+                                                    @php
+                                                        $content = $feature->content;
+                                                        $featureName = $content['title'] ?? 'İsimsiz Özellik';
+                                                        $slug = str_replace('feature_', '', $feature->section);
+                                                        $metaSection = 'meta_tags_feature_' . $slug;
+                                                    @endphp
+                                                    <option value="{{ $metaSection }}">⚡ {{ $featureName }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                            @endif
+                                        </select>
+                                        <small class="text-muted mt-2 d-block">
+                                            Seçtiğiniz sayfanın meta tags bilgilerini aşağıda düzenleyebilirsiniz.
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-4">
+                                
+                                <!-- META TAGS FORM -->
+                                <form id="metaForm">
+                                    <input type="hidden" id="current_section" value="meta_tags_home">
+                                    
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-globe me-2"></i> Temel Meta Bilgileri
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-heading me-1"></i> Site Başlığı (Title) *
+                                        </label>
+                                        <input type="text" class="form-control" id="meta_title" 
+                                            placeholder="Serbis - Teknik Servis Yönetim Sistemi" required>
+                                        <small class="text-muted">
+                                            <i class="fas fa-lightbulb me-1"></i> 
+                                            Tarayıcı sekmesinde ve Google'da görünür (50-60 karakter önerilir)
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-align-left me-1"></i> Meta Description (Açıklama) *
+                                        </label>
+                                        <textarea class="form-control" id="meta_description" rows="3" 
+                                                placeholder="Teknik servis işletmenizi dijitalleştirin..." required></textarea>
+                                        <small class="text-muted">
+                                            <i class="fas fa-lightbulb me-1"></i>
+                                            Google arama sonuçlarında görünür (150-160 karakter önerilir)
+                                        </small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-secondary" id="desc_count">0 / 160 karakter</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-key me-1"></i> Meta Keywords (Anahtar Kelimeler)
+                                        </label>
+                                        <input type="text" class="form-control" id="meta_keywords" 
+                                            placeholder="teknik servis yazılımı, servis yönetimi, crm">
+                                        <small class="text-muted">Virgülle ayırarak yazın (10-15 kelime yeterli)</small>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    <h6 class="mb-3">
+                                        <i class="fab fa-facebook me-2"></i> Open Graph (Facebook, WhatsApp, LinkedIn)
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">OG:Title</label>
+                                        <input type="text" class="form-control" id="og_title" 
+                                            placeholder="Boş bırakırsanız Site Başlığı kullanılır">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">OG:Description</label>
+                                        <textarea class="form-control" id="og_description" rows="2" 
+                                                placeholder="Boş bırakırsanız Meta Description kullanılır"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-image me-1"></i> OG:Image (Sosyal Medya Görseli)
+                                        </label>
+                                        <input type="file" class="form-control" id="og_image_file" accept="image/*">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Önerilen boyut: 1200x630px
+                                        </small>
+                                        
+                                        <div id="current_og_image" class="mt-3" style="display: none;">
+                                            <p class="mb-2 fw-bold">Mevcut Görsel:</p>
+                                            <img id="og_image_preview" src="" style="max-width: 400px; border-radius: 8px; border: 2px solid #dee2e6;">
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    <h6 class="mb-3">
+                                        <i class="fab fa-twitter me-2"></i> Twitter Card
+                                    </h6>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Twitter:Title</label>
+                                        <input type="text" class="form-control" id="twitter_title" 
+                                            placeholder="Boş bırakırsanız Site Başlığı kullanılır">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Twitter:Description</label>
+                                        <textarea class="form-control" id="twitter_description" rows="2" 
+                                                placeholder="Boş bırakırsanız Meta Description kullanılır"></textarea>
+                                    </div>
+                                    
+                                    
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i> Kaydet
+                                    </button>
+                                    
+                                    <button type="button" class="btn btn-secondary" id="preview_meta">
+                                        <i class="fas fa-eye me-1"></i> Önizleme
+                                    </button>
+                                </form>
+                            </div>
+
+                           <!-- Google Tags Tab -->
+<div class="tab-pane" id="google_tags" role="tabpanel">
+    <h5 class="mb-3">
+        <i class="fab fa-google me-2"></i> Google Tags (Analytics & Tag Manager)
+    </h5>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Google Analytics ve Google Tag Manager kodlarınızı buraya ekleyin.
+    </div>
+    
+    <form id="googleTagsForm">
+        <!-- Google Analytics -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">
+                <i class="fas fa-chart-line me-1"></i> Google Analytics (gtag.js)
+            </label>
+            <textarea class="form-control font-monospace" id="google_analytics_code" rows="8" 
+                placeholder="<!-- Google tag (gtag.js) -->
+<script async src='https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX'></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>">{{ $googleTags->content['analytics_code'] ?? '' }}</textarea>
+        </div>
+        
+        <!-- GTM HEAD -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">
+                <i class="fas fa-tags me-1"></i> Google Tag Manager - HEAD Bölümü
+            </label>
+            <textarea class="form-control font-monospace" id="google_tag_manager_head" rows="8" 
+                placeholder="<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+<!-- End Google Tag Manager -->">{{ $googleTags->content['tag_manager_head'] ?? '' }}</textarea>
+            <small class="text-muted">Bu kod &lt;head&gt; bölümüne eklenecek</small>
+        </div>
+        
+        <!-- GTM BODY -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">
+                <i class="fas fa-code me-1"></i> Google Tag Manager - BODY Bölümü
+            </label>
+            <textarea class="form-control font-monospace" id="google_tag_manager_body" rows="4" 
+                placeholder="<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src='https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX'
+height='0' width='0' style='display:none;visibility:hidden'></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->">{{ $googleTags->content['tag_manager_body'] ?? '' }}</textarea>
+            <small class="text-muted">Bu kod &lt;body&gt; açılışından hemen sonra eklenecek</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Kaydet
+        </button>
+    </form>
+</div>
+
+
 
                             <!-- Contact Tab -->
                             <div class="tab-pane" id="contact" role="tabpanel">
@@ -448,7 +710,32 @@
     </div>
 </div>
 
-<script>
+<script>  
+function showToast(icon, title) {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        width: '280px',                    // Daha da küçük
+        padding: '10px 16px',              // Kompakt padding
+        iconColor: icon === 'success' ? '#28a745' : 
+                   icon === 'error' ? '#dc3545' : 
+                   icon === 'info' ? '#17a2b8' : '#ffc107',
+        customClass: {
+            popup: 'mini-toast',
+        },
+        didOpen: (toast) => {
+            toast.style.fontSize = '9px';
+            toast.style.fontWeight = '300';
+        }
+    });
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
+}
 $(document).ready(function() {
     // Tab hash kontrolü
     let hash = window.location.hash;
@@ -587,7 +874,257 @@ $('.header-form').on('submit', function(e) {
         }
     });
 });
+    // ==========================================
+    // META TAGS - SAYFA DEĞİŞTİĞİNDE VERİ YÜKLE
+    // ==========================================
+    
+    // Sayfa seçimi değiştiğinde
+    $('#meta_page_select').on('change', function() {
+        const section = $(this).val();
+        loadMetaData(section);
+    });
 
+    // Sayfa yüklendiğinde ilk veriyi getir (Ana Sayfa) - GECİKTİRİLDİ
+    setTimeout(function() {
+        loadMetaData('meta_tags_home');
+    }, 500); // 500ms sonra yükle (Swal yüklendikten sonra)
+    // Meta verilerini yükle
+    function loadMetaData(section) {
+        $('#current_section').val(section);
+        
+        // Loading göster
+        $('#metaForm').css('opacity', '0.5');
+        
+        $.ajax({
+            url: '{{ route("super.admin.frontend.content.get") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                section: section
+            },
+            success: function(response) {
+                if(response.success && response.data) {
+                    const content = response.data.content || {};
+                    
+                    // Form alanlarını doldur
+                    $('#meta_title').val(content.title || '');
+                    $('#meta_description').val(content.description || '');
+                    $('#meta_keywords').val(content.keywords || '');
+                    $('#og_title').val(content.og_title || '');
+                    $('#og_description').val(content.og_description || '');
+                    $('#twitter_title').val(content.twitter_title || '');
+                    $('#twitter_description').val(content.twitter_description || '');
+                    
+                    // Karakter sayacını güncelle
+                    updateDescCount();
+                    
+                    // OG Image varsa göster
+                    if(content.og_image) {
+                        $('#og_image_preview').attr('src', '{{ url("/") }}/' + content.og_image);
+                        $('#current_og_image').show();
+                    } else {
+                        $('#current_og_image').hide();
+                    }
+                    
+                    // Success toast
+                    showToast('success', 'Sayfa verileri yüklendi');
+                } else {
+                    // Boş form
+                    clearMetaForm();
+                    showToast('info', 'Bu sayfa için henüz meta tags tanımlanmamış');
+                }
+                
+                $('#metaForm').css('opacity', '1');
+            },
+            error: function() {
+                showToast('error', 'Veriler yüklenirken hata oluştu');
+                $('#metaForm').css('opacity', '1');
+            }
+        });
+    }
+    
+    // Form alanlarını temizle
+    function clearMetaForm() {
+        $('#meta_title').val('');
+        $('#meta_description').val('');
+        $('#meta_keywords').val('');
+        $('#og_title').val('');
+        $('#og_description').val('');
+        $('#twitter_title').val('');
+        $('#twitter_description').val('');
+        $('#og_image_file').val('');
+        $('#current_og_image').hide();
+        updateDescCount();
+    }
+    
+    // ==========================================
+    // META TAGS - FORM SUBMIT (KAYDET)
+    // ==========================================
+    
+    $('#metaForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const section = $('#current_section').val();
+        const formData = new FormData();
+        
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('section', section);
+        formData.append('title', $('#meta_title').val());
+        formData.append('description', $('#meta_description').val());
+        formData.append('keywords', $('#meta_keywords').val());
+        formData.append('og_title', $('#og_title').val());
+        formData.append('og_description', $('#og_description').val());
+        formData.append('twitter_title', $('#twitter_title').val());
+        formData.append('twitter_description', $('#twitter_description').val());
+        
+        // OG Image dosyası varsa ekle
+        const ogImageFile = $('#og_image_file')[0].files[0];
+        if(ogImageFile) {
+            formData.append('og_image', ogImageFile);
+        }
+        
+        // Loading
+        Swal.fire({
+            title: 'Kaydediliyor...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        $.ajax({
+            url: '{{ route("super.admin.frontend.content.update") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                Swal.close();
+                
+                if(response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: response.message || 'Meta tags kaydedildi',
+                        confirmButtonText: 'Tamam'
+                    });
+                    
+                    // Yeni görseli göster
+                    if(response.og_image) {
+                        $('#og_image_preview').attr('src', '{{ url("/") }}/' + response.og_image);
+                        $('#current_og_image').show();
+                        $('#og_image_file').val('');
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: response.message || 'Kaydetme başarısız',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                
+                let errorMsg = 'Kaydetme sırasında hata oluştu';
+                if(xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: errorMsg,
+                    confirmButtonText: 'Tamam'
+                });
+            }
+        });
+    });
+    
+    // ==========================================
+    // KARAKTER SAYACI
+    // ==========================================
+    
+    $('#meta_description').on('input', function() {
+        updateDescCount();
+    });
+    
+    function updateDescCount() {
+        const length = $('#meta_description').val().length;
+        $('#desc_count').text(length + ' / 160 karakter');
+        
+        if(length > 160) {
+            $('#desc_count').removeClass('bg-secondary').addClass('bg-danger');
+        } else if(length > 140) {
+            $('#desc_count').removeClass('bg-secondary bg-danger').addClass('bg-warning');
+        } else {
+            $('#desc_count').removeClass('bg-warning bg-danger').addClass('bg-secondary');
+        }
+    }
+    
+    // ==========================================
+    // ÖNİZLEME
+    // ==========================================
+    
+    $('#preview_meta').on('click', function() {
+        const title = $('#meta_title').val() || 'Başlık girilmedi';
+        const description = $('#meta_description').val() || 'Açıklama girilmedi';
+        const ogImage = $('#og_image_preview').attr('src') || '{{ asset("frontend/img/anasayfa2.png") }}';
+        
+        Swal.fire({
+            title: 'Meta Tags Önizleme',
+            html: `
+                <div style="text-align: left; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                    <img src="${ogImage}" style="width: 100%; border-radius: 4px; margin-bottom: 10px;">
+                    <h6 style="color: #1a73e8; margin-bottom: 5px;">${title}</h6>
+                    <p style="color: #5f6368; font-size: 14px; margin: 0;">${description}</p>
+                    <p style="color: #5f6368; font-size: 12px; margin-top: 5px;">serbis.com.tr</p>
+                </div>
+            `,
+            width: 600,
+            confirmButtonText: 'Kapat'
+        });
+    });
+    
+// Google Tags Form Submit
+$('#googleTagsForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const data = {
+        section: 'google_tags',
+        content: {
+            analytics_code: $('#google_analytics_code').val(),
+            tag_manager_head: $('#google_tag_manager_head').val(),  // ✅ DOĞRU ALAN ADI
+            tag_manager_body: $('#google_tag_manager_body').val()   // ✅ YENİ ALAN
+        }
+    };
+    
+    console.log('Gönderilen data:', data); // Debug için
+    
+    $.ajax({
+        url: '{{ route("super.admin.frontend.content.update") }}',
+        method: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            console.log('Başarılı response:', response); // Debug
+            toastr.success('Google Tags başarıyla güncellendi!');
+            
+            // Sayfayı yenile (kayıt başarılıysa)
+            setTimeout(function() {
+                location.reload();
+            }, 1500);
+        },
+        error: function(xhr) {
+            console.error('Hata:', xhr.responseText); // Debug
+            toastr.error('Bir hata oluştu: ' + (xhr.responseJSON?.message || 'Bilinmeyen hata'));
+        }
+    });
+});
 // Contact Form Submit
 $('#contactForm').on('submit', function(e) {
     e.preventDefault();

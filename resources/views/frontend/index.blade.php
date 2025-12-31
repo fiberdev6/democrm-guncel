@@ -22,13 +22,16 @@
                 <p class="hero-description-ana">
                     {{ $hero['description'] }}
                 </p>
-                <div class="hero-buttons">
+               <div class="hero-buttons">
+                    <!-- Giriş Butonu (Değişmedi) -->
                     <a href="{{ url('/kullanici-girisi') }}" class="btn-hero-primary" target="_blank">
                         <i class="{{ $hero['primary_button_icon'] }}"></i> {{ $hero['primary_button_text'] }}
                     </a>
-                    <a href="#" class="btn-hero-secondary" data-bs-toggle="modal" data-bs-target="#videoModal">
+                    
+                    <!-- Video Butonu (button olarak değiştirildi) -->
+                    <button type="button" class="btn-hero-secondary" data-bs-toggle="modal" data-bs-target="#videoModal">
                         <i class="{{ $hero['secondary_button_icon'] }}"></i> {{ $hero['secondary_button_text'] }}
-                    </a>
+                    </button>
                 </div>
                 <div class="hero-features">
                     @foreach($hero['features'] as $feature)
@@ -50,7 +53,7 @@
                                 <span class="dot"></span>
                                 <span class="dot"></span>
                             </div>
-                            <div class="browser-url">app.serbis.com/dashboard</div>
+                            <div class="browser-url">serbis.com.tr</div>
                             <div class="browser-actions"></div>
                         </div>
                         <div class="browser-content">
@@ -375,13 +378,24 @@
 </section>
 
 <!-- Video Modal -->
-<div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" 
+     id="videoModal" 
+     tabindex="-1" 
+     aria-hidden="true"
+     data-bs-backdrop="true"
+     data-bs-keyboard="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             <div class="modal-body">
                 <div class="ratio ratio-16x9">
-                    <iframe id="videoIframe" src="" title="{{ $video['title'] ?? 'Serbis Demo Video' }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe id="videoIframe" 
+                            src="" 
+                            title="{{ $video['title'] ?? 'Serbis Demo Video' }}" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+                            allowfullscreen
+                            playsinline></iframe>
                 </div>
             </div>
         </div>
@@ -390,31 +404,138 @@
 
 @endsection
 
+<!-- Mobil Sabit Alt Menü -->
+{{-- <div class="mobile-bottom-nav">
+    <div class="nav-items">
+        <!-- Demo İste -->
+        <a href="{{ url('/kullanici-girisi') }}" 
+           class="nav-item" 
+           target="_blank"
+           rel="noopener noreferrer">
+            <i class="fas fa-rocket"></i>
+            <span>Demo</span>
+        </a>
+        
+        <!-- E-posta (Dinamik) -->
+        <a href="mailto:{{ $contact['mobile_menu']['email'] ?? 'info@serbis.com' }}" 
+           class="nav-item nav-email"
+           data-action="email">
+            <i class="fas fa-envelope"></i>
+            <span>E-posta</span>
+        </a>
+        
+        <!-- Telefon (Dinamik) -->
+        <a href="tel:{{ $contact['mobile_menu']['phone'] ?? '02129092861' }}" 
+           class="nav-item nav-phone"
+           data-action="phone">
+            <i class="fas fa-phone"></i>
+            <span>Ara</span>
+        </a>
+    </div>
+</div> --}}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-play carousels
-        var testimonialsCarousel = new bootstrap.Carousel(document.getElementById('testimonialsCarousel'), {
-            interval: 5000,
-            ride: 'carousel'
+document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // AUTO-PLAY CAROUSELS
+    // ==========================================
+    var testimonialsCarousel = new bootstrap.Carousel(document.getElementById('testimonialsCarousel'), {
+        interval: 5000,
+        ride: 'carousel'
+    });
+
+    var integrationsCarousel = new bootstrap.Carousel(document.getElementById('integrationsCarousel'), {
+        interval: 4000,
+        ride: 'carousel'
+    });
+
+    // ==========================================
+    // VIDEO MODAL - DESKTOP + MOBİL
+    // ==========================================
+    var videoModalEl = document.getElementById('videoModal');
+    var videoIframe = document.getElementById('videoIframe');
+    var videoUrl = '{{ $video["video_url"] ?? "https://www.youtube.com/embed/Caa1CJUFFIs" }}';
+    var closeBtn = videoModalEl ? videoModalEl.querySelector('.btn-close') : null;
+    
+    if (videoModalEl && videoIframe) {
+        // Modal açılma
+        videoModalEl.addEventListener('show.bs.modal', function () {
+            videoIframe.src = videoUrl + '?autoplay=1&rel=0&playsinline=1';
         });
-
-        var integrationsCarousel = new bootstrap.Carousel(document.getElementById('integrationsCarousel'), {
-            interval: 4000,
-            ride: 'carousel'
-        });
-
-        // Video Modal - DİNAMİK
-        var videoModal = document.getElementById('videoModal');
-        var videoIframe = document.getElementById('videoIframe');
-        var videoUrl = '{{ $video["video_url"] ?? "https://www.youtube.com/embed/Caa1CJUFFIs" }}?autoplay=1&rel=0';
-
-        videoModal.addEventListener('show.bs.modal', function () {
-            videoIframe.src = videoUrl;
-        });
-
-        videoModal.addEventListener('hide.bs.modal', function () {
+        
+        // Modal kapanma
+        videoModalEl.addEventListener('hide.bs.modal', function () {
             videoIframe.src = '';
         });
+        
+        // ==========================================
+        // X BUTONUNA TIKLAMA - MOBİL FİX
+        // ==========================================
+        if (closeBtn) {
+            // Click event
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var modal = bootstrap.Modal.getInstance(videoModalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            });
+            
+            // Touch event (mobil)
+            closeBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var modal = bootstrap.Modal.getInstance(videoModalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }, { passive: false });
+            
+            // Touchstart feedback
+            closeBtn.addEventListener('touchstart', function(e) {
+                this.style.opacity = '0.5';
+            }, { passive: true });
+            
+            closeBtn.addEventListener('touchcancel', function(e) {
+                this.style.opacity = '1';
+            }, { passive: true });
+        }
+    }
+    
+    // ==========================================
+    // VİDEO BUTONUNA TIKLAMA - MOBİL FİX
+    // ==========================================
+    var videoButton = document.querySelector('[data-bs-target="#videoModal"]');
+    
+    if (videoButton) {
+        videoButton.addEventListener('touchstart', function(e) {
+            this.style.opacity = '0.8';
+        }, { passive: true });
+        
+        videoButton.addEventListener('touchend', function(e) {
+            this.style.opacity = '1';
+        }, { passive: true });
+    }
+// ==========================================
+    // MOBİL MENÜ - BROWSER EXTENSİON FİX
+    // ==========================================
+    const mobileNavLinks = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    
+    mobileNavLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            // Event'in yayılmasını durdur (uzantılar müdahale etmesin)
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            const href = this.getAttribute('href');
+            
+            // Eğer tel: veya mailto: ise direkt aç
+            if (href && (href.startsWith('tel:') || href.startsWith('mailto:'))) {
+                // Tarayıcının native davranışını kullan
+                window.location.href = href;
+            }
+        }, true); // true = capturing phase
     });
+});
 </script>

@@ -97,6 +97,7 @@ use App\Http\Controllers\Frontend\ArizaKoduController;
 use App\Services\ParasutService;
 use App\Http\Controllers\FrontendHomeController;
 
+
 /******************************************************************* PARAŞÜT DENEME ROUTLARI *************************************************************************************/
 // Bağlantı testi
 // Route::get('/parasut/test', function (ParasutService $parasut) {
@@ -483,6 +484,9 @@ Route::middleware(['auth', 'superadmin'])->group(function () {
         // Ana Sayfa İçerik Yönetimi
         Route::get('/icerik', [SuperAdminController::class, 'homepageContent'])->name('content');
         Route::post('/icerik/guncelle', [SuperAdminController::class, 'updateHomepageContent'])->name('content.update');
+
+        //Meta veri getirme route'u
+        Route::post('homepage/content/get', [SuperAdminController::class, 'getHomepageContent'])->name('content.get');
 
         // Navigation Yönetimi
         Route::get('/navigation', [SuperAdminController::class, 'navigationSettings'])->name('navigation');
@@ -878,7 +882,9 @@ Route::controller(HomeController::class)->group(function() {
     Route::get('/entegrasyonlar', 'Integrations')->name('integrations');
     Route::get('/fiyatlar', 'Pricing')->name('pricing');
     Route::get('/iletisim', [HomeController::class, 'Contact'])->name('contact_frontend');
-    Route::post('/iletisim', [HomeController::class, 'ContactSubmit'])->name('contact.submit');
+    Route::post('/iletisim', [HomeController::class, 'ContactSubmit'])
+    ->name('contact.submit')
+    ->middleware('throttle:contact-form');
     // Plan seçimi route'u
     Route::get('/select-plan/{planIndex}', [HomeController::class, 'selectPlan'])->name('select.plan');
     
@@ -893,7 +899,9 @@ Route::controller(HomeController::class)->group(function() {
     Route::post('/validate-step', 'validateStep')->name('validate.step');
     Route::get('/get-subscription-plans', 'getSubscriptionPlans')->name('get.subscription.plans');
     // Yeni SMS doğrulama rotaları
-    Route::post('/sms-dogrulama', 'verifySmsCode')->name('sms.verification.verify');
+    Route::post('/sms-dogrulama', 'verifySmsCode')
+    ->name('sms.verification.verify')
+    ->middleware('throttle:sms-verify');
     Route::get('/kayit-basarili', 'RegisterSuccess')->name('register.success');
 
     Route::get('/kullanici-girisi', 'Login')->name('giris');
@@ -904,7 +912,9 @@ Route::controller(HomeController::class)->group(function() {
 
     //Şifre Sıfırlama rotaları
     Route::get('/sifremi-unuttum', 'showForgotPasswordForm')->name('password.request');
-    Route::post('/sifre-sifirlama-talebi', 'sendResetLinkEmail')->name('password.email');
+    Route::post('/sifre-sifirlama-talebi', 'sendResetLinkEmail')
+    ->name('password.email')
+    ->middleware('throttle:password-reset');
     Route::get('/sifre-sifirla/{token}', 'showResetPasswordForm')->name('password.reset');
     Route::post('/sifre-sifirla', 'resetPassword')->name('password.update');
 

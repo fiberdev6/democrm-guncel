@@ -20,10 +20,10 @@
                     <p class="sector-detail-subtitle">{{ $sector['description'] }}</p>
                     <div class="sector-hero-buttons">
                         <a href="{{ url('/kullanici-girisi') }}"  class="btn btn-hero-primary" target="_blank">
-                            <i class="fas fa-phone"></i> İletişime Geç
+                             Ücretsiz Deneyin
                         </a>
                         <a href="#hizmetler" class="btn btn-hero-secondary">
-                            <i class="fas fa-info-circle"></i> Detaylı Bilgi
+                             Detaylı Bilgi
                         </a>
                     </div>
                 </div>
