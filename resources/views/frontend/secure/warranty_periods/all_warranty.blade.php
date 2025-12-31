@@ -21,6 +21,12 @@
               @endforeach
             </tbody>
           </table>
+
+            @if($warranties->count() > 0)
+              <div class="text-muted mt-2" style="font-size: 13px;">
+                Toplam: <strong>{{ $warranties->count() }}</strong> 
+              </div>
+            @endif
         </div>
   
   <!-- add modal content -->
@@ -119,6 +125,16 @@
         });
       }
     });
+  });
+
+  $('#datatableWarranty').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
   });
   </script>
   

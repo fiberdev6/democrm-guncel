@@ -31,6 +31,11 @@ use Illuminate\Support\Facades\Cache;
 
 class StockController extends Controller
 {
+
+    public function __construct()
+{
+    $this->middleware('permission:Depoyu Görebilir');
+}
 public function AllStocks($tenant_id, Request $request)
 {
     if (!Auth::check()) {
@@ -206,14 +211,27 @@ public function AllStocks($tenant_id, Request $request)
         ->where('tenant_id', $tenant_id)
         ->get();
     $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-    $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-    $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+    $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('marka', 'asc')->get();
+    $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
     return view('frontend.secure.stocks.all_stocks', compact('firma', 'personeller', 'markalar', 'cihazlar', 'rafListesi'));
 }
@@ -248,13 +266,29 @@ private function applyMainStockDateRange($query, Request $request): void
 
             $firma = Tenant::findOrFail($tenant_id);
             $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-            $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
+
+            // Tenant'ın sektörünü kontrol et
+            $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+            $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    // Beyaz eşya sektörü: default + kendi eklediği
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $firma->id);
+                } else {
+                    // Diğer sektörler: sadece kendi eklediği
+                    $query->where('firma_id', $firma->id);
+                }
             })->orderBy('marka', 'asc')->get();
-            $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
+            $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+                if ($isBeyazEsya) {
+                    // Beyaz eşya sektörü: default + kendi eklediği
+                    $query->whereNull('firma_id')
+                        ->orWhere('firma_id', $firma->id);
+                } else {
+                    // Diğer sektörler: sadece kendi eklediği
+                    $query->where('firma_id', $firma->id);
+                }
             })->orderBy('cihaz', 'asc')->get();
 
              // Konsinye kategori (global) + firmaya özel kategoriler
@@ -389,14 +423,26 @@ public function EditStock($tenant_id, $id) {
     $firma = Tenant::findOrFail($tenant_id);
     $stock = Stock::with(['raf', 'marka', 'cihaz', 'sonHareket'])->findOrFail($id);
     $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-    $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-    $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+    $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+    if ($isBeyazEsya) {
+        // Beyaz eşya sektörü: default + kendi eklediği
+        $query->whereNull('firma_id')
+              ->orWhere('firma_id', $firma->id);
+    } else {
+        // Diğer sektörler: sadece kendi eklediği
+        $query->where('firma_id', $firma->id);
+    }
+})->orderBy('marka', 'asc')->get();
+    $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+    if ($isBeyazEsya) {
+        // Beyaz eşya sektörü: default + kendi eklediği
+        $query->whereNull('firma_id')
+              ->orWhere('firma_id', $firma->id);
+    } else {
+        // Diğer sektörler: sadece kendi eklediği
+        $query->where('firma_id', $firma->id);
+    }
+})->orderBy('cihaz', 'asc')->get();
 
     // Konsinye kategori (global) + firmaya özel kategoriler
     $kategoriler = StockCategory::where(function($query) use ($tenant_id) {
@@ -490,31 +536,47 @@ public function searchSuppliers(Request $request, $tenant_id)
 }
 //Marka Arama
 public function searchBrands(Request $request, $tenant_id)
-    {
-        $search = $request->input('q');
-        $data = DeviceBrand::where('marka', 'LIKE', "%{$search}%")
-    ->where(function($query) use ($tenant_id) {
-        $query->whereNull('firma_id')
-              ->orWhere('firma_id', $tenant_id);
-    })
-    ->latest()
-    ->take(5)
-    ->get(['id', 'marka as text']);
-        return response()->json($data);
-    }
-//Cihaz türü arama
+{
+    $search = $request->input('q');
+    $firma = Tenant::find($tenant_id);
+    $isBeyazEsya = $firma && $firma->sektor === 'beyaz-esya';
+    
+    $data = DeviceBrand::where('marka', 'LIKE', "%{$search}%")
+        ->where(function($query) use ($tenant_id, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                $query->whereNull('firma_id')
+                      ->orWhere('firma_id', $tenant_id);
+            } else {
+                $query->where('firma_id', $tenant_id);
+            }
+        })
+        ->latest()
+        ->take(5)
+        ->get(['id', 'marka as text']);
+        
+    return response()->json($data);
+}
+
 public function searchDevices(Request $request, $tenant_id)
 {
-        $search = $request->input('q');
-        $data = DeviceType::where('cihaz', 'LIKE', "%{$search}%")
-                ->where(function($query) use ($tenant_id) {
-                    $query->whereNull('firma_id')
-                        ->orWhere('firma_id', $tenant_id);
-                })
-                                       ->latest()
-                                       ->take(5)
-                                       ->get(['id', 'cihaz as text']);
-        return response()->json($data);
+    $search = $request->input('q');
+    $firma = Tenant::find($tenant_id);
+    $isBeyazEsya = $firma && $firma->sektor === 'beyaz-esya';
+    
+    $data = DeviceType::where('cihaz', 'LIKE', "%{$search}%")
+        ->where(function($query) use ($tenant_id, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                $query->whereNull('firma_id')
+                      ->orWhere('firma_id', $tenant_id);
+            } else {
+                $query->where('firma_id', $tenant_id);
+            }
+        })
+        ->latest()
+        ->take(5)
+        ->get(['id', 'cihaz as text']);
+        
+    return response()->json($data);
 }
 //Kategori Arama
 // Kategori arama fonksiyonu - konsinye hariç
@@ -1339,14 +1401,29 @@ public function consignmentDevice($tenant_id)
     $firma = Tenant::findOrFail($tenant_id);
     $personeller = User::where('tenant_id', $tenant_id)->get();
     $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-    $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-    $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+
+    // Tenant'ın sektörünü kontrol et
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+    $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('marka', 'asc')->get();
+    $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
 
     return view('frontend.secure.stocks.consignment_device', compact('firma', 'personeller', 'rafListesi', 'markalar', 'cihazlar'));
@@ -1530,14 +1607,29 @@ public function AddConsignmentDevice($tenant_id)
 {
     $firma = Tenant::findOrFail($tenant_id);
     $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-    $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-    $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+    $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('marka', 'asc')->get();
+    $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
     $kategoriler = StockCategory::where('firma_id', $tenant_id)->get();
 
     return view('frontend.secure.stocks.add_consignment_device', compact('firma', 'rafListesi', 'markalar', 'cihazlar', 'kategoriler', 'tenant_id'));
@@ -1665,14 +1757,30 @@ public function EditConsignmentDevice($tenant_id, $id)
    $stock = Stock::with(['raf', 'marka', 'cihaz', 'sonHareket'])->findOrFail($id);
 
     $rafListesi = StockShelf::where('firma_id', $tenant_id)->get();
-    $markalar = DeviceBrand::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-    $cihazlar = DeviceType::where(function($query) use ($firma) {
-                $query->whereNull('firma_id')
-                    ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+
+    // Tenant'ın sektörünü kontrol et
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+    $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('marka', 'asc')->get();
+    $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
     
     if ($stock->urunKategori != 3) {

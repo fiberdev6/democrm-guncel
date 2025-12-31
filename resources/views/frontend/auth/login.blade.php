@@ -15,6 +15,60 @@
     
     <link href="{{asset('frontend/css/login.css')}}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <style>
+        /* Şifre Güvenliği Göstergesi Stilleri */
+        .password-strength-container {
+            margin-top: 8px;
+        }
+        .password-strength-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .password-strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        .password-strength-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .strength-weak { background: #dc3545; }
+        .strength-fair { background: #fd7e14; }
+        .strength-good { background: #ffc107; }
+        .strength-strong { background: #28a745; }
+        .text-weak { color: #dc3545; }
+        .text-fair { color: #fd7e14; }
+        .text-good { color: #ffc107; }
+        .text-strong { color: #28a745; }
+        
+        .password-requirements {
+            margin-top: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        .password-requirements ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .password-requirements li {
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+        .password-requirements li.valid {
+            color: #28a745;
+        }
+        .password-requirements li.valid::marker {
+            content: "✓ ";
+        }
+    </style>
    
 </head>
 <body>
@@ -248,6 +302,20 @@
                                 @enderror
                             </div>
 
+                            <!-- Sektör Seçimi - YENİ -->
+                            <div class="mb-3">
+                                <label for="sektor" class="form-label" style="color: #333; font-weight: 500;">
+                                    Sektör <span style="color: #dc3545;">*</span>
+                                </label>
+                                <select name="sektor" id="sektor" class="form-select" required>
+                                    <option value="">Sektör Seçiniz...</option>
+                                    <!-- Sektörler JavaScript ile yüklenecek -->
+                                </select>
+                                @error('sektor')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
                             <!-- İl ve İlçe Seçimi - Yan Yana -->
                             <div class="mb-3">
                                 <label class="form-label" style="color: #333; font-weight: 500;">
@@ -273,6 +341,19 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Açık Adres - YENİ -->
+                            <div class="mb-3">
+                                <label for="adres" class="form-label" style="color: #333; font-weight: 500;">
+                                    Açık Adres
+                                </label>
+                                <textarea name="adres" id="adres" class="form-control" rows="2" 
+                                          placeholder="Mahalle, Sokak, Bina No, Daire No..." maxlength="255"></textarea>
+                                <small id="adresCounter" class="character-counter">0 / 255</small>
+                                @error('adres')
+                                <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                             
                             <div class="mb-3">
                                 <label for="tel" class="form-label" style="color: #333; font-weight: 500;">
@@ -291,7 +372,26 @@
                                 </label>
                                 <input type="password" name="password" id="registerPassword" class="form-control" 
                                        placeholder="Şifre" required minlength="6">
-                                <small class="form-text" style="color: #6c757d;">Şifre en az 6 karakter olmalıdır.</small>
+                                
+                                <!-- Şifre Güvenliği Göstergesi - YENİ -->
+                                <div class="password-strength-container">
+                                    <div class="password-strength-bar">
+                                        <div class="password-strength-fill" id="passwordStrengthFill"></div>
+                                    </div>
+                                    <div class="password-strength-text" id="passwordStrengthText"></div>
+                                </div>
+                                
+                                <!-- Şifre Gereksinimleri - YENİ -->
+                                <div class="password-requirements" id="passwordRequirements">
+                                    <ul>
+                                        <li id="req-length">En az 6 karakter</li>
+                                        <li id="req-uppercase">En az 1 büyük harf (A-Z)</li>
+                                        <li id="req-lowercase">En az 1 küçük harf (a-z)</li>
+                                        <li id="req-number">En az 1 rakam (0-9)</li>
+                                        <li id="req-special">En az 1 özel karakter (!@#$%^&*)</li>
+                                    </ul>
+                                </div>
+                                
                                 @error('password')
                                 <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -361,6 +461,9 @@
         $(document).ready(function() {
             // Load subscription plans on page load
             loadSubscriptionPlans();
+            
+            // Sektörleri yükle
+            loadSectors();
 
             // Input masks
             $(".tel").mask("999 999 99 99");
@@ -383,6 +486,25 @@
                 // Sadece harf, rakam ve alt çizgi bırak
                 value = value.replace(/[^a-zA-Z0-9_]/g, '');
                 $(this).val(value);
+            });
+
+            // Açık adres karakter sayacı
+            $('#adres').on('input', function() {
+                var currentLength = $(this).val().length;
+                var maxLength = $(this).attr('maxlength');
+                $('#adresCounter').text(currentLength + " / " + maxLength);
+                
+                if (currentLength >= maxLength) {
+                    $('#adresCounter').removeClass('text-muted').addClass('text-danger');
+                } else {
+                    $('#adresCounter').removeClass('text-danger').addClass('text-muted');
+                }
+            });
+
+            // Şifre güvenliği kontrolü - YENİ
+            $('#registerPassword').on('input', function() {
+                const password = $(this).val();
+                checkPasswordStrength(password);
             });
 
             // Password confirmation validation
@@ -428,17 +550,6 @@
                     $('#firmaAdiCounter').removeClass('text-danger').addClass('text-muted');
                 }
             });
-
-            // Plan selection change event
-            // $('#subscription_plan').on('change', function() {
-            //     const selectedOption = $(this).find('option:selected');
-            //     if (selectedOption.val()) {
-            //         const planData = selectedOption.data();
-            //         showPlanInfo(planData);
-            //     } else {
-            //         hidePlanInfo();
-            //     }
-            // });
 
             // Form toggle functionality
             let isLoginMode = true;
@@ -494,6 +605,79 @@
                 }, 100);
             @endif
 
+            // Şifre Güvenliği Kontrol Fonksiyonu - YENİ
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                let requirements = {
+                    length: password.length >= 6,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /[0-9]/.test(password),
+                    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                };
+
+                // Gereksinimleri güncelle
+                $('#req-length').toggleClass('valid', requirements.length);
+                $('#req-uppercase').toggleClass('valid', requirements.uppercase);
+                $('#req-lowercase').toggleClass('valid', requirements.lowercase);
+                $('#req-number').toggleClass('valid', requirements.number);
+                $('#req-special').toggleClass('valid', requirements.special);
+
+                // Güç hesapla
+                if (requirements.length) strength++;
+                if (requirements.uppercase) strength++;
+                if (requirements.lowercase) strength++;
+                if (requirements.number) strength++;
+                if (requirements.special) strength++;
+
+                // Bar ve metin güncelle
+                const fill = $('#passwordStrengthFill');
+                const text = $('#passwordStrengthText');
+
+                fill.removeClass('strength-weak strength-fair strength-good strength-strong');
+                text.removeClass('text-weak text-fair text-good text-strong');
+
+                if (password.length === 0) {
+                    fill.css('width', '0%');
+                    text.text('');
+                } else if (strength <= 2) {
+                    fill.css('width', '25%').addClass('strength-weak');
+                    text.text('Zayıf').addClass('text-weak');
+                } else if (strength === 3) {
+                    fill.css('width', '50%').addClass('strength-fair');
+                    text.text('Orta').addClass('text-fair');
+                } else if (strength === 4) {
+                    fill.css('width', '75%').addClass('strength-good');
+                    text.text('İyi').addClass('text-good');
+                } else {
+                    fill.css('width', '100%').addClass('strength-strong');
+                    text.text('Güçlü').addClass('text-strong');
+                }
+
+                return strength;
+            }
+
+            // Sektörleri yükle - YENİ
+            function loadSectors() {
+                $.ajax({
+                    url: '{{ route("get.sectors") }}',
+                    method: 'GET',
+                    success: function(response) {
+                        const select = $('#sektor');
+                        select.empty().append('<option value="">Sektör Seçiniz...</option>');
+                        
+                        if (response.sectors && response.sectors.length > 0) {
+                            response.sectors.forEach(function(sector) {
+                                select.append(`<option value="${sector.slug}">${sector.title}</option>`);
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Sektörler yüklenirken hata:', xhr);
+                    }
+                });
+            }
+
             function loadSubscriptionPlans() {
                 $.ajax({
                     url: '{{ route("get.subscription.plans") }}',
@@ -506,27 +690,27 @@
                         
                         response.plans.forEach(function(plan) {
                             // Limit bilgilerini formatla
-                let limitText = '';
-                const users = plan.limits.users || 0;
-                const dealers = plan.limits.dealers || 0;
-                
-                // Kullanıcı sayısı
-                if (users == -1) {
-                    limitText = 'Sınırsız Kullanıcı';
-                } else if (users > 0) {
-                    limitText = users + ' Kullanıcı';
-                }
-                
-                // Bayi sayısı (varsa)
-                if (dealers == -1) {
-                    limitText += limitText ? ', Sınırsız Bayi' : 'Sınırsız Bayi';
-                } else if (dealers > 0) {
-                    limitText += limitText ? ', ' + dealers + ' Bayi' : dealers + ' Bayi';
-                }
-                
-                const option = $('<option></option>')
-                    .attr('value', plan.id)
-                    .text(`${plan.name}${limitText ? ' - ' + limitText : ''}`)
+                            let limitText = '';
+                            const users = plan.limits.users || 0;
+                            const dealers = plan.limits.dealers || 0;
+                            
+                            // Kullanıcı sayısı
+                            if (users == -1) {
+                                limitText = 'Sınırsız Kullanıcı';
+                            } else if (users > 0) {
+                                limitText = users + ' Kullanıcı';
+                            }
+                            
+                            // Bayi sayısı (varsa)
+                            if (dealers == -1) {
+                                limitText += limitText ? ', Sınırsız Bayi' : 'Sınırsız Bayi';
+                            } else if (dealers > 0) {
+                                limitText += limitText ? ', ' + dealers + ' Bayi' : dealers + ' Bayi';
+                            }
+                            
+                            const option = $('<option></option>')
+                                .attr('value', plan.id)
+                                .text(`${plan.name}${limitText ? ' - ' + limitText : ''}`)
                                 .data('name', plan.name)
                                 .data('price', plan.price)
                                 .data('billing_cycle', plan.billing_cycle)
@@ -547,16 +731,8 @@
                         
                         if (response.selected_plan_id) {
                             select.val(response.selected_plan_id);
-                            // const selectedOption = select.find('option:selected');
-                            // if (selectedOption.val()) {
-                            //     showPlanInfo(selectedOption.data());
-                            // }
                         } else if (defaultPlan) {
                             select.val(defaultPlan.id);
-                            // const selectedOption = select.find('option:selected');
-                            // if (selectedOption.val()) {
-                            //     showPlanInfo(selectedOption.data());
-                            // }
                         }
                     },
                     error: function(xhr) {
@@ -741,8 +917,10 @@
                             email: $('#registerEmail').val(),
                             vergiNo: $('#vergiNo').val(),
                             firma_adi: $('#firma_adi').val(),
+                            sektor: $('#sektor').val(),
                             il_id: $('#il_id').val(),          
                             ilce_id: $('#ilce_id').val(),
+                            adres: $('#adres').val(),
                             tel: $('#tel').val(),
                             password: $('#registerPassword').val(),
                             password_confirmation: $('#password_confirmation').val(),
@@ -787,74 +965,74 @@
                     }
 
                     try {
-            await validateStepOnServer(currentStep);
-            
-            // Step 2'den Step 3'e geçiyorsak, önce SMS gönder
-            if (currentStep === 2) {
-                await sendSMS();
-            }
-            
-            currentStep++;
-            showStep(currentStep);
-            
-        } catch (error) {
-            if (error.errors) {
-                displayErrors(error.errors);
-            } else {
-                toastr.error(error.message || 'Bir hata oluştu.');
-            }
-        }
-    } else if (currentStep === 3) {
-        verifySMSAndComplete();
-    }
+                        await validateStepOnServer(currentStep);
+                        
+                        // Step 2'den Step 3'e geçiyorsak, önce SMS gönder
+                        if (currentStep === 2) {
+                            await sendSMS();
+                        }
+                        
+                        currentStep++;
+                        showStep(currentStep);
+                        
+                    } catch (error) {
+                        if (error.errors) {
+                            displayErrors(error.errors);
+                        } else {
+                            toastr.error(error.message || 'Bir hata oluştu.');
+                        }
+                    }
+                } else if (currentStep === 3) {
+                    verifySMSAndComplete();
+                }
             });
 
             function sendSMS() {
                 return new Promise((resolve, reject) => {
-        const formData = {
-            subscription_plan: $('#subscription_plan').val(),
-            vergiNo: $('#vergiNo').val(),
-            name: $('#name').val(),
-            username: $('#username').val(),
-            email: $('#registerEmail').val(),
-            firma_adi: $('#firma_adi').val(),
-            il_id: $('#il_id').val(),               // EKLE
-            ilce_id: $('#ilce_id').val(), 
-            tel: $('#tel').val(),
-            password: $('#registerPassword').val(),
-            password_confirmation: $('#password_confirmation').val(),
-            _token: $('meta[name="csrf-token"]').attr('content')
-        };
+                    const formData = {
+                        subscription_plan: $('#subscription_plan').val(),
+                        vergiNo: $('#vergiNo').val(),
+                        name: $('#name').val(),
+                        username: $('#username').val(),
+                        email: $('#registerEmail').val(),
+                        firma_adi: $('#firma_adi').val(),
+                        sektor: $('#sektor').val(),
+                        il_id: $('#il_id').val(),
+                        ilce_id: $('#ilce_id').val(),
+                        adres: $('#adres').val(),
+                        tel: $('#tel').val(),
+                        password: $('#registerPassword').val(),
+                        password_confirmation: $('#password_confirmation').val(),
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    };
 
-        $.ajax({
-            url: '{{ route("kayit.action") }}',
-            method: 'POST',
-            data: formData,
-            success: function(response) {
-                smsSent = true;
-                $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
-                $('#countdownTimer').show();
-                startCountdown();
-                toastr.success('SMS başarıyla gönderildi!');
-                resolve(response);
-            },
-            error: function(xhr) {
-                const errors = xhr.responseJSON?.errors;
-                if (errors) {
-                    // Hataları göster ama Step 2'de kal
-                    displayErrors(errors);
-                    //toastr.error('Lütfen form alanlarını kontrol ediniz.');
-                } else {
-                    const message = xhr.responseJSON?.message || 'SMS gönderilirken bir hata oluştu.';
-                    toastr.error(message);
-                }
-                reject(xhr.responseJSON);
-            }
-        });
-    });
+                    $.ajax({
+                        url: '{{ route("kayit.action") }}',
+                        method: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            smsSent = true;
+                            $('#nextBtn').text('Doğrula ve Kaydı Tamamla');
+                            $('#countdownTimer').show();
+                            startCountdown();
+                            toastr.success('SMS başarıyla gönderildi!');
+                            resolve(response);
+                        },
+                        error: function(xhr) {
+                            const errors = xhr.responseJSON?.errors;
+                            if (errors) {
+                                displayErrors(errors);
+                            } else {
+                                const message = xhr.responseJSON?.message || 'SMS gönderilirken bir hata oluştu.';
+                                toastr.error(message);
+                            }
+                            reject(xhr.responseJSON);
+                        }
+                    });
+                });
             }
 
-            $('input, select').on('input change', function() {
+            $('input, select, textarea').on('input change', function() {
                 $(this).removeClass('is-invalid');
                 $(this).siblings('.text-danger').remove();
             });
@@ -958,60 +1136,60 @@
     </script>
     <script>
         $(document).ready(function() {
-    // İlleri yükle
-    loadCities();
+            // İlleri yükle
+            loadCities();
 
-    // İl seçildiğinde ilçeleri yükle
-    $('#il_id').on('change', function() {
-        const ilId = $(this).val();
-        const ilceSelect = $('#ilce_id');
-        
-        if (ilId) {
-            ilceSelect.prop('disabled', true).html('<option value="">Yükleniyor...</option>');
-            
-            $.ajax({
-                url: '{{ route("get.districts") }}',
-                method: 'GET',
-                data: { il_id: ilId },
-                success: function(response) {
-                    ilceSelect.empty().append('<option value="">İlçe Seçiniz...</option>');
+            // İl seçildiğinde ilçeleri yükle
+            $('#il_id').on('change', function() {
+                const ilId = $(this).val();
+                const ilceSelect = $('#ilce_id');
+                
+                if (ilId) {
+                    ilceSelect.prop('disabled', true).html('<option value="">Yükleniyor...</option>');
                     
-                    response.districts.forEach(function(district) {
-                        ilceSelect.append(`<option value="${district.id}">${district.ilceName}</option>`);
+                    $.ajax({
+                        url: '{{ route("get.districts") }}',
+                        method: 'GET',
+                        data: { il_id: ilId },
+                        success: function(response) {
+                            ilceSelect.empty().append('<option value="">İlçe Seçiniz...</option>');
+                            
+                            response.districts.forEach(function(district) {
+                                ilceSelect.append(`<option value="${district.id}">${district.ilceName}</option>`);
+                            });
+                            
+                            ilceSelect.prop('disabled', false);
+                        },
+                        error: function(xhr) {
+                            console.error('İlçeler yüklenirken hata:', xhr);
+                            ilceSelect.empty().append('<option value="">Hata oluştu</option>');
+                            toastr.error('İlçeler yüklenirken bir hata oluştu.');
+                        }
                     });
-                    
-                    ilceSelect.prop('disabled', false);
-                },
-                error: function(xhr) {
-                    console.error('İlçeler yüklenirken hata:', xhr);
-                    ilceSelect.empty().append('<option value="">Hata oluştu</option>');
-                    toastr.error('İlçeler yüklenirken bir hata oluştu.');
+                } else {
+                    ilceSelect.prop('disabled', true).empty().append('<option value="">Önce İl Seçiniz...</option>');
                 }
             });
-        } else {
-            ilceSelect.prop('disabled', true).empty().append('<option value="">Önce İl Seçiniz...</option>');
-        }
-    });
 
-    function loadCities() {
-        $.ajax({
-            url: '{{ route("get.cities") }}',
-            method: 'GET',
-            success: function(response) {
-                const select = $('#il_id');
-                select.empty().append('<option value="">İl Seçiniz...</option>');
-                
-                response.cities.forEach(function(city) {
-                    select.append(`<option value="${city.id}">${city.name}</option>`);
+            function loadCities() {
+                $.ajax({
+                    url: '{{ route("get.cities") }}',
+                    method: 'GET',
+                    success: function(response) {
+                        const select = $('#il_id');
+                        select.empty().append('<option value="">İl Seçiniz...</option>');
+                        
+                        response.cities.forEach(function(city) {
+                            select.append(`<option value="${city.id}">${city.name}</option>`);
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error('İller yüklenirken hata:', xhr);
+                        toastr.error('İller yüklenirken bir hata oluştu.');
+                    }
                 });
-            },
-            error: function(xhr) {
-                console.error('İller yüklenirken hata:', xhr);
-                toastr.error('İller yüklenirken bir hata oluştu.');
             }
         });
-    }
-});
     </script>
 </body>
 </html>

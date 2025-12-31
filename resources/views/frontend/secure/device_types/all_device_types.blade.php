@@ -30,6 +30,12 @@
               @endforeach
             </tbody>
         </table>
+
+        @if($device_types->count() > 0)
+        <div class="text-muted mt-2" style="font-size: 13px;">
+             Toplam: <strong>{{ $device_types->count() }}</strong> 
+        </div>
+        @endif
     </div>
 
     {{-- MOBİL GÖRÜNÜM (YENİ LİSTE YAPISI) --}}
@@ -169,6 +175,16 @@
         });
       }
     });
+  });
+
+  $('#datatableDeviceTypes').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
   });
   </script>
   

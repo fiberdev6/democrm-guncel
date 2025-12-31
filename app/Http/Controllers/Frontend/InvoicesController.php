@@ -25,7 +25,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class InvoicesController extends Controller
+{   
+    public function __construct()
 {
+    $this->middleware('permission:Faturaları Görebilir');
+}
     public function AllInvoice(Request $request, $tenant_id) {
         $invoices = Invoice::where('firma_id',$tenant_id)->where('durum', 1)->orderBy('id','desc')->get();
         //$musteriler = Customer::where('firma_id', $tenant_id)->orderBy('adSoyad', 'ASC')->get();

@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Cache;
 
 class OfferController extends Controller
 {
+    public function __construct()
+{
+    $this->middleware('permission:Teklifleri Görür');
+}
     public function AllOffer(Request $request, $tenant_id) {
         $firma = Tenant::where('id', $tenant_id)->first();
         if (!$firma) {

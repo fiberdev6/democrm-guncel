@@ -33,10 +33,19 @@ class ServiceBatchPlanningController extends Controller
         // Get districts for Istanbul
         $districts = Ilce::where('sehir_id', '34')->orderBy('ilceName')->get();
         $iller = Il::orderBy('name', 'asc')->get();
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
         // Get device types
-        $deviceTypes = DeviceType::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+        $deviceTypes = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('cihaz', 'asc')->get();
         
         // Get service sources

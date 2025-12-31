@@ -25,6 +25,12 @@
             @endforeach
           </tbody>
         </table>
+
+        @if($permissions->count() > 0)
+              <div class="text-muted mt-2" style="font-size: 13px;">
+                Toplam: <strong>{{ $permissions->count() }}</strong> 
+              </div>
+          @endif
       </div>
 
 <!-- add modal content -->
@@ -124,5 +130,15 @@ $(document).ready(function(){
             });
         }
     });
+  });
+
+  $('#datatablePermission').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
   });
 </script>

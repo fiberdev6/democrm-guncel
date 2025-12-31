@@ -139,9 +139,18 @@ class IncomingCallsController extends Controller
     public function AddCall($tenant_id) {
         $firma = Tenant::where('id', $tenant_id)->first();
         $service_resources = ServiceResource::where('firma_id', $tenant_id)->get();
-        $device_brands = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('marka', 'asc')->get();
         return view('frontend.secure.incoming_calls.add_call', compact('firma','service_resources','device_brands'));
     }
@@ -231,9 +240,17 @@ class IncomingCallsController extends Controller
         $call_id = IncomingCall::where('firma_id', $tenant_id)->where('id', $call_id)->first();
         $operators = User::where('tenant_id', $tenant_id)->get();
         $service_resources = ServiceResource::where('firma_id', $tenant_id)->get();
-        $device_brands = DeviceBrand::where(function($query) use ($firma) {
-            $query->whereNull('firma_id')
-                ->orWhere('firma_id', $firma->id);
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $device_brands = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
+                $query->whereNull('firma_id')
+                    ->orWhere('firma_id', $firma->id);
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
         })->orderBy('marka', 'asc')->get();
         return view('frontend.secure.incoming_calls.edit_call', compact('firma','call_id','operators','service_resources','device_brands'));
     }

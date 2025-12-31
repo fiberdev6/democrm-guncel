@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Tenant;
 use App\Models\Survey;
 use App\Models\ServiceStageAnswer;
 use App\Models\StageQuestion;
@@ -23,6 +24,11 @@ use Yajra\DataTables\Facades\DataTables;
 
 class StatisticController extends Controller
 {
+
+    public function __construct()
+{
+    $this->middleware('permission:İstatistikleri Görebilir');
+}
 ///////////////////////////////////////////////////////Service Statistics///////////////////////////////////////////////////////////////////
     public function ServiceStatistics(Request $request,$tenant_id)
     {
@@ -367,11 +373,20 @@ class StatisticController extends Controller
     }
 ///////////////////////////////////////////////////////Technician Statistics///////////////////////////////////////////////////////////////////
 public function TechnicianStatistics($tenant_id)
-{
+{   $firma = Tenant::findOrFail($tenant_id);
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
     // Cihaz türlerini al
-    $cihazTurleri = DeviceType::where('firma_id', $tenant_id)
-                             ->orderBy('cihaz', 'ASC')
-                             ->get();
+    $cihazTurleri = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
     return view('frontend.secure.statistics.technician_statistics', compact(
         'tenant_id', 
@@ -1698,11 +1713,20 @@ public function getSurveyStatisticsData(Request $request, $tenant_id)
         $totalCompletedServices += $stat['tamamlanan_servis_sayisi'];
         $totalSurveyedServices += $stat['anket_yapilan_servis_sayisi'];
     }
+    $firma = Tenant::findOrFail($tenant_id);
+    $isBeyazEsya = $firma->sektor === 'beyaz-esya';
 
     // Cihaz türleri listesi
-    $deviceTypes = DeviceType::where('firma_id', $tenant_id)
-                            ->orderBy('cihaz', 'ASC')
-                            ->get();
+    $deviceTypes = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
     return response()->json([
         'personnelStats' => $finalStats,
@@ -1796,10 +1820,20 @@ public function getSurveyResults(Request $request, $tenant_id)
         })
         ->get();
 
+        $firma = Tenant::findOrFail($tenant_id);
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
     // Cihaz türleri
-    $deviceTypes = DeviceType::where('firma_id', $tenant_id)
-                            ->orderBy('cihaz', 'ASC')
-                            ->get();
+    $deviceTypes = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+        if ($isBeyazEsya) {
+            // Beyaz eşya sektörü: default + kendi eklediği
+            $query->whereNull('firma_id')
+                ->orWhere('firma_id', $firma->id);
+        } else {
+            // Diğer sektörler: sadece kendi eklediği
+            $query->where('firma_id', $firma->id);
+        }
+    })->orderBy('cihaz', 'asc')->get();
 
     return response()->json([
         'questionStats' => $questionStats,

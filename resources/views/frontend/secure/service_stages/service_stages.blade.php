@@ -23,6 +23,12 @@
               @endforeach
             </tbody>
           </table>
+
+          @if($stages->count() > 0)
+              <div class="text-muted mt-2" style="font-size: 13px;">
+                Toplam: <strong>{{ $stages->count() }}</strong> 
+              </div>
+          @endif
         </div>
   
   <!-- add modal content -->
@@ -121,6 +127,16 @@
         });
       }
     });
+  });
+
+  $('#datatableServiceStage').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
   });
   </script>
   

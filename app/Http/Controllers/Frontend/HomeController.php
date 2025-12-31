@@ -971,7 +971,30 @@ public function selectPlan($planIndex)
         return view('frontend.auth.register');
     }
 
-        public function validateStep(Request $request) 
+        public function getSectors()
+{
+    $sectorsContent = HomepageContent::getSection('sectors_content');
+    
+    $sectors = [];
+    if ($sectorsContent && isset($sectorsContent['sectors'])) {
+        foreach ($sectorsContent['sectors'] as $sector) {
+            $sectors[] = [
+                'slug' => $sector['slug'] ?? '',
+                'title' => $sector['title'] ?? ''
+            ];
+        }
+    }
+    
+    return response()->json([
+        'success' => true,
+        'sectors' => $sectors
+    ]);
+}
+
+/**
+ * validateStep - GÜNCELLENMİŞ
+ */
+public function validateStep(Request $request) 
 {
     $step = $request->input('step');
     
@@ -1018,7 +1041,7 @@ public function selectPlan($planIndex)
             ]);
             
         } elseif ($step == 3) {
-            // Step 3: Company information and password validation
+            // Step 3: Company information and password validation - GÜNCELLENDİ
             $request->merge([
                 'tel' => preg_replace('/\D/', '', $request->tel),
                 'vergiNo' => preg_replace('/\D/', '', $request->vergiNo),
@@ -1030,10 +1053,17 @@ public function selectPlan($planIndex)
                 'email' => 'required|email|max:255|unique:tenants,eposta',
                 'vergiNo' => 'required|max:10|unique:tenants,vergiNo',
                 'firma_adi' => 'required|string|max:50',
+                'sektor' => 'required|string|max:100', // YENİ - Sektör
                 'il_id' => 'required|exists:ils,id',
                 'ilce_id' => 'required|exists:ilces,id',
+                'adres' => 'nullable|string|max:255', // YENİ - Açık Adres (opsiyonel)
                 'tel' => 'required|digits_between:10,11|unique:tenants,tel1',
-                'password' => 'required|min:6|confirmed',
+                'password' => [
+                    'required',
+                    'min:6',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+                ],
             ], [
                 'subscription_plan.required' => 'Lütfen bir abonelik planı seçiniz.',
                 'subscription_plan.exists' => 'Seçilen plan geçerli değil.',
@@ -1053,17 +1083,20 @@ public function selectPlan($planIndex)
                 'vergiNo.unique' => 'Bu vergi numarası zaten kayıtlı.',
                 'firma_adi.required' => 'Firma Adı alanı zorunludur.',
                 'firma_adi.max' => 'Firma Adı alanı en fazla 50 karakter olmalıdır.',
+                'sektor.required' => 'Sektör seçimi zorunludur.', // YENİ
+                'sektor.max' => 'Sektör alanı en fazla 100 karakter olmalıdır.', // YENİ
                 'il_id.required' => 'İl seçimi zorunludur.',
                 'il_id.exists' => 'Geçersiz il seçimi.',
                 'ilce_id.required' => 'İlçe seçimi zorunludur.',
                 'ilce_id.exists' => 'Geçersiz ilçe seçimi.',
+                'adres.max' => 'Açık adres alanı en fazla 255 karakter olmalıdır.', // YENİ
                 'tel.required' => 'Telefon alanı zorunludur.',
-                'tel.regex' => 'Telefon formatı hatalıdır.',
-                'tel.min' => 'Telefon numarası en az 10-11 haneli olmalıdır.',
+                'tel.digits_between' => 'Telefon numarası 10-11 haneli olmalıdır.',
                 'tel.unique' => 'Bu telefon numarası zaten kayıtlı.',
                 'password.required' => 'Şifre alanı zorunludur.',
                 'password.min' => 'Şifre en az 6 karakter olmalıdır.',
                 'password.confirmed' => 'Şifreler eşleşmiyor.',
+                'password.regex' => 'Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir.',
             ]);
         }
         
@@ -1095,12 +1128,19 @@ public function RegisterAction(Request $request)
         'name' => 'required|string|max:255',
         'username' => 'required|string|min:3|max:50|unique:tb_user,username|regex:/^[a-zA-Z0-9_]+$/',
         'firma_adi' => 'required|string|max:50|regex:/^[a-zA-ZğüşıöçĞÜŞİÖÇ0-9\s]+$/',
+        'sektor' => 'required|string|max:100', // YENİ
         'il_id' => 'required|exists:ils,id',
         'ilce_id' => 'required|exists:ilces,id',
+        'adres' => 'nullable|string|max:255', // YENİ
         'vergiNo' => 'required|digits:10|unique:tenants,vergiNo',
         'tel' => 'required|digits_between:10,11|unique:tenants,tel1',
         'email' => 'required|email|max:255|unique:tenants,eposta',
-        'password' => 'required|min:6|confirmed',
+        'password' => [
+            'required',
+            'min:6',
+            'confirmed',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+        ],
     ], [
         'subscription_plan.required' => 'Lütfen bir abonelik planı seçiniz.',
         'subscription_plan.exists' => 'Seçilen plan geçerli değil.',
@@ -1114,10 +1154,12 @@ public function RegisterAction(Request $request)
         'firma_adi.required' => 'Firma Adı alanı zorunludur.',
         'firma_adi.max' => 'Firma Adı alanı en fazla 50 karakter olmalıdır.',
         'firma_adi.regex' => 'Firma adı sadece harf, rakam ve boşluk içerebilir. Noktalama işaretleri kullanılamaz.',
+        'sektor.required' => 'Sektör seçimi zorunludur.', // YENİ
         'il_id.required' => 'İl seçimi zorunludur.',
         'il_id.exists' => 'Geçersiz il seçimi.',
         'ilce_id.required' => 'İlçe seçimi zorunludur.',
         'ilce_id.exists' => 'Geçersiz ilçe seçimi.',
+        'adres.max' => 'Açık adres alanı en fazla 255 karakter olmalıdır.', // YENİ
         'vergiNo.required' => 'Vergi numarası alanı zorunludur.',
         'vergiNo.digits' => 'Vergi numarası 10 haneli olmalıdır.',
         'vergiNo.unique' => 'Bu vergi numarası zaten kayıtlı.',
@@ -1131,6 +1173,7 @@ public function RegisterAction(Request $request)
         'password.required' => 'Şifre alanı zorunludur.',
         'password.min' => 'Şifre en az 6 karakter olmalıdır.',
         'password.confirmed' => 'Şifreler eşleşmiyor.',
+        'password.regex' => 'Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir.',
     ]);
 
     // 6 haneli rastgele bir doğrulama kodu oluştur
@@ -1525,11 +1568,13 @@ public function resendSmsCode(Request $request)
     $tenant = new Tenant([
         'name' => $data['name'],
         'firma_adi' => $data['firma_adi'],
-        'firma_kodu' => $firmaKodu, // Yeni firma kodu
+        'firma_kodu' => $firmaKodu,
         'vergiNo' => $data['vergiNo'],
         'firma_slug' => $firmaAdiSlug,
+        'sektor' => $data['sektor'] ?? null, // YENİ - Sektör
         'il' => $data['il_id'],
         'ilce' => $data['ilce_id'],
+        'adres' => $data['adres'] ?? null, // YENİ - Açık Adres
         'tel1' => $data['tel'],
         'eposta' => $data['email'],
         'username' => $tenantUsername,
@@ -1551,9 +1596,9 @@ public function resendSmsCode(Request $request)
 
     $user = new User([
         'name' => $data['name'],
-        'username' => $username, // Kullanıcının girdiği username
+        'username' => $username,
         'tel' => $data['tel'],
-        'eposta' => $data['email'], // Email olarak kaydet
+        'eposta' => $data['email'],
         'tenant_id' => $tenant_id,
         'password' => Hash::make($data['password']),
         'status' => '1',
@@ -1579,7 +1624,7 @@ public function resendSmsCode(Request $request)
     ]);
 
     // Varsayılan Fiş Tasarımı Oluştur
-$defaultReceiptDesign = "[FIRMAADI]
+    $defaultReceiptDesign = "[FIRMAADI]
 TEL : [TEL]-[TEL2]
 ADRES : [ADRES]
 --------------------------------
@@ -1612,12 +1657,12 @@ TARIH : [TARIHSAAT]
 TARIH : [TARIHSAAT]
 ================================";
 
-ReceiptDesign::create([
-    'firma_id' => $tenant_id,
-    'fisTasarimi' => $defaultReceiptDesign,
-    'boyut' => 58,
-    'created_at' => Carbon::now(),
-]);
+    ReceiptDesign::create([
+        'firma_id' => $tenant_id,
+        'fisTasarimi' => $defaultReceiptDesign,
+        'boyut' => 58,
+        'created_at' => Carbon::now(),
+    ]);
 
     // Session'dan firma kodunu kaydet
     session(['firma_kodu' => $firmaKodu]);

@@ -34,6 +34,12 @@ div.dataTables_wrapper div.dataTables_filter {
                 @endforeach
             </tbody>
         </table>
+
+        @if($deleted_services->count() > 0)
+              <div class="text-muted mt-2" style="font-size: 13px;">
+                Toplam: <strong>{{ $deleted_services->count() }}</strong> 
+              </div>
+        @endif
     </div>
 
 
@@ -111,5 +117,15 @@ $(document).on('click', '.restoreService', function () {
         }
     });
 });
+
+$('#datatableDeletedService').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
+  });
 </script>  
   

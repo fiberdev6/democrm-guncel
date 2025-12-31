@@ -20,10 +20,15 @@ use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\CashTransactionRequest;
 
 
 class CashTransactionsController extends Controller
+{   
+    public function __construct()
 {
+    $this->middleware('permission:Kasayı Görebilir');
+}
     public function Filter(Request $request, $tenant_id)
     {   
         $firma = Tenant::where('id', $tenant_id)->first();
@@ -43,14 +48,29 @@ class CashTransactionsController extends Controller
         $musteriler = [];
         $bayiler = User::where('tenant_id', $tenant_id)->role('Bayi')->where('status', 1)->orderBy('name', 'asc')->get();
         $tedarikciler = StockSupplier::where('firma_id', $tenant_id)->get();
-        $markalar = DeviceBrand::where(function($query) use ($firma) {
+        
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-        $cihazlar = DeviceType::where(function($query) use ($firma) {
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('marka', 'asc')->get();
+        $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('cihaz', 'asc')->get();
 
         if ($request->ajax()) {
             
@@ -430,18 +450,33 @@ private function applyMainDateRange($query, Request $request): void
             $query->whereIn('name', ['Admin','Super Admin']);
         })->where('status', 1)->orderBy('name', 'asc')->get();
         $tedarikciler = StockSupplier::where('firma_id', $tenant_id)->orderBy('id','asc')->get();
-        $markalar = DeviceBrand::where(function($query) use ($firma) {
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-        $cihazlar = DeviceType::where(function($query) use ($firma) {
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('marka', 'asc')->get();
+        $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('cihaz', 'asc')->get();
         return view('frontend.secure.cash_transactions.get_cash_payments',compact('cash_payment_id','answers','personeller','tedarikciler','markalar','cihazlar'));
     }
 
-    public function StoreCashTransaction(Request $request, $tenant_id){
+    public function StoreCashTransaction(CashTransactionRequest $request, $tenant_id){
         $token = $request->input('form_token');
         // Token boş mu kontrol et
         if (empty($token)) {
@@ -532,19 +567,34 @@ private function applyMainDateRange($query, Request $request): void
             $query->whereIn('name', ['Admin','Super Admin']);
         })->where('status', 1)->orderBy('name', 'asc')->get();
         $tedarikciler = StockSupplier::where('firma_id', $tenant_id)->orderBy('id','asc')->get();
-        $markalar = DeviceBrand::where(function($query) use ($firma) {
+
+        $isBeyazEsya = $firma->sektor === 'beyaz-esya';
+
+        $markalar = DeviceBrand::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('marka', 'asc')->get();
-        $cihazlar = DeviceType::where(function($query) use ($firma) {
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('marka', 'asc')->get();
+        $cihazlar = DeviceType::where(function($query) use ($firma, $isBeyazEsya) {
+            if ($isBeyazEsya) {
+                // Beyaz eşya sektörü: default + kendi eklediği
                 $query->whereNull('firma_id')
                     ->orWhere('firma_id', $firma->id);
-            })->orderBy('cihaz', 'asc')->get();
+            } else {
+                // Diğer sektörler: sadece kendi eklediği
+                $query->where('firma_id', $firma->id);
+            }
+        })->orderBy('cihaz', 'asc')->get();
         return view('frontend.secure.cash_transactions.edit_cash_transaction',compact('firma','cash_transaction_id','payment_methods','payment_types','cash_payment_id','personeller','tedarikciler','markalar','cihazlar'));
 
     }
 
-    public function UpdateCashTransaction(Request $request, $tenant_id) {
+    public function UpdateCashTransaction(CashTransactionRequest $request, $tenant_id) {
         $firma = Tenant::where('id', $tenant_id)->first();
         $cash_transaction_id = $request->id;
         

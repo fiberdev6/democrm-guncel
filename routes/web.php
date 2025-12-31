@@ -314,7 +314,7 @@ Route::controller(UserController::class)->group(function () {
 
 // Kullanıcı destek talepleri
 Route::middleware(['auth','check.tenant.status'])->prefix('{tenant_id}')->group(function () {
-    Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index');
+    Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index')->middleware(['permission:Destek Taleplerini Görebilir']);
     Route::get('/support/create', [SupportTicketController::class, 'create'])->name('support.create');
     Route::post('/support', [SupportTicketController::class, 'store'])->name('support.store')->middleware('check.storage');
     Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');
@@ -921,7 +921,7 @@ Route::controller(HomeController::class)->group(function() {
     // İl ve İlçe listeleme route'ları
     Route::get('/get-cities', 'getCities')->name('get.cities');
     Route::get('/get-districts', 'getDistricts')->name('get.districts');
-
+    Route::get('/get-sectors', 'getSectors')->name('get.sectors');
 });
 
 Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','checkTenantId','check.subscription','redirect_after_login','check.tenant.status']], function () {
@@ -984,7 +984,7 @@ Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','checkTenantId'
         Route::post('/check-username', 'checkUsernameAvailability')->name('check.username.availability');
 
         //Dealer Routes
-        Route::get('/bayiler', 'AllDealers')->name('dealers');
+        Route::get('/bayiler', 'AllDealers')->name('dealers')->middleware(['permission:Bayileri Görebilir']);
         Route::get('/bayi-ekle', 'AddDealer')->name('add.dealer')->middleware('check.storage');
         Route::post('/bayi-kaydet', 'StoreDealer')->name('store.dealer');
         Route::get('/bayi/duzenle/{id}', 'EditDealer')->name('edit.dealer');
@@ -1080,7 +1080,7 @@ Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','checkTenantId'
 
     //GENEL AYARLAR MODÜLÜ
     Route::controller(GenelAyarlarController::class)->group(function() {
-        Route::get('/genel-ayarlar', 'GeneralSettings')->name('general.settings');
+        Route::get('/genel-ayarlar', 'GeneralSettings')->name('general.settings')->middleware(['permission:Genel Ayarları Görebilir']);
         Route::get('/firma-bilgileri', 'CompanySettings')->name('firma.settings');
         Route::post('/firma-ayari/guncelle', 'UpdateCompanySet')->name('update.firma');
         Route::get('/sms-ayarlari', 'SmsSettings')->name('sms.settings');
@@ -1420,7 +1420,7 @@ Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','checkTenantId'
 
     Route::prefix('payment-history')->name('payment-history.')->group(function () {
         Route::get('/', [PaymentHistoryController::class, 'index'])
-            ->name('index');
+            ->name('index')->middleware(['permission:Ödeme Geçmişini Görebilir']);
         Route::get('/export', [PaymentHistoryController::class, 'export'])
             ->name('export');  
         Route::get('/invoice/{type}/{id}', [PaymentHistoryController::class, 'downloadInvoice'])
@@ -1503,7 +1503,7 @@ Route::controller(IntegrationMarketplaceController::class)->group(function() {
 
 Route::group(['prefix' => '{tenant_id}', 'middleware' => ['auth','check.tenant.status']], function () {
     Route::get('/abonelik-paketleri', [SubscriptionController::class, 'subscriptionPlans'])->name('abonelikler');
-    Route::get('/subscription/plans', [SubscriptionController::class, 'plans'])->name('subscription.plans');
+    Route::get('/subscription/plans', [SubscriptionController::class, 'plans'])->name('subscription.plans')->middleware(['permission:Abonelik Planını Görebilir']);
     Route::get('/subscription/{planid}', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
     Route::post('/subscription/{planid}', [SubscriptionController::class, 'processSubscription'])->name('subscription.process');
     Route::get('/subscription/{planid}/payment', [SubscriptionController::class, 'payment'])->name('subscription.payment');
@@ -1540,7 +1540,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::prefix('{tenant_id}')->group(function () {
-        Route::get('/storage-paketleri', [StorageController::class, 'packages'])->name('storage.packages');
+        Route::get('/storage-paketleri', [StorageController::class, 'packages'])->name('storage.packages')->middleware(['permission:Storage Paketlerini Görebilir']);
         Route::post('/storage-satin-al', [StorageController::class, 'purchase'])->name('storage.purchase');
 
     });

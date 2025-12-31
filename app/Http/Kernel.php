@@ -75,5 +75,8 @@ class Kernel extends HttpKernel
         'check.tenant.status' => \App\Http\Middleware\CheckTenantStatus::class,
         'check.storage' => \App\Http\Middleware\CheckStorageLimit::class,
         'check.token.expiration' => \App\Http\Middleware\CheckTokenExpiration::class,
+        'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
     ];
 }

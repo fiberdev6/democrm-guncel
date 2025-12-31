@@ -13,51 +13,51 @@
           <input type="hidden" name="id" value="{{$prim->id}}">
   
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Operatör Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Operatör Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="operatorPrim" type="number" step="0.01" value="{{ $prim->operatorPrim}}" required>
             </div>
           </div>
           <!-- end row -->
   
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Operatör Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Operatör Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="operatorPrimTutari" type="number" step="0.01" value="{{ $prim->operatorPrimTutari}}" required>
             </div>
           </div>
 
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Teknisyen Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Teknisyen Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="teknisyenPrim" type="number" step="0.01" value="{{ $prim->teknisyenPrim}}" required>
             </div>
           </div>
 
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Teknisyen Prim Tutarı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Teknisyen Prim Tutarı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="teknisyenPrimTutari" type="number" step="0.01" value="{{ $prim->teknisyenPrimTutari}}" required>
             </div>
           </div>
 
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Atölye Ustası Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Atölye Ustası Prim Oranı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="atolyePrim" type="number" step="0.01" value="{{ $prim->atolyePrim}}" required>
             </div>
           </div>
 
           <div class="row align-items-center border-bottom custom-border-bottom mb-1">
-            <label class="col-sm-4 col-form-label">Atölye Ustası Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label">Atölye Ustası Prim Servis Sınırı:<span style="font-weight: bold; color: red;">*</span></label>
+            <div class="col-sm-6">
               <input class="form-control" name="atolyePrimTutari" type="number" step="0.01" value="{{ $prim->atolyePrimTutari}}" required>
             </div>
           </div>
     
           <div class="row align-items-center mt-2 ">
-            <label class="col-sm-4 col-form-label"></label>
-            <div class="col-sm-8">
+            <label class="col-sm-6 col-form-label"></label>
+            <div class="col-sm-6">
               <input type="submit" class="btn btn-info waves-effect waves-light" value="Kaydet">
             </div>
           </div>

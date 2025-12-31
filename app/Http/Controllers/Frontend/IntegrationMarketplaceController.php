@@ -16,6 +16,10 @@ use App\Services\ActivityLogger;
 
 class IntegrationMarketplaceController extends Controller
 {
+    public function __construct()
+{
+    $this->middleware('role:Patron');
+}
     // Entegrasyonlar pazaryeri - Firmalar buradan süper admin'in eklediği entegrasyonları görür
     public function index(Request $request, $tenant_id) {
         $user = Auth::user();

@@ -1,59 +1,70 @@
 <div class="row mt-3 mb-2">
   <div class="col-12">
-    <div class=" d-sm-flex align-items-center justify-content-between">
-      <h4 class="mb-sm-0 fw-bold text-gray border-bottom pb-2" style="font-size: 15px;">Yazıcı Fiş Tasarımı</h4>
+    <div class="d-sm-flex align-items-center justify-content-center">
+      <h4 class="mb-sm-0 fw-bold text-gray pb-2" style="font-size: 19px;">Yazıcı Fiş Tasarımı</h4>
     </div>
   </div>
 </div>
-        <form id="yaziciFisTasarimi" method="post" action="{{ route('update.receipt.design',$firma->id)}}" enctype="multipart/form-data" class="needs-validation" novalidate style="width: 50%;">
-          @csrf
-          <input type="hidden" name="id" value="{{ $receiptDesign->id ?? '' }}">
-  
-          <div class="row mb-3">
-            <div class="col-sm-6">
-              <textarea class="form-control  mesaj" name="mesaj" type="text" rows="10" style="resize: none;width: 330px;height: 510px;"  required>{{$receiptDesign->fisTasarimi ?? ''}}</textarea>
-            </div>
-            <div class="col-sm-6">
-              <label style="display: block;margin-bottom: 5px">Kullanmak İstediğiniz Yazıcı</label>
-                <select class="form-control yaziciBoyut" name="yaziciBoyut" style="width: 150px;">
-                  <option value="58" {{ ($receiptDesign->boyut ?? null) == 58 ? 'selected' : '' }}>58mm Yazıcı</option>
-                  <option value="80" {{ ($receiptDesign->boyut ?? null) == 80 ? 'selected' : '' }}>80mm Yazıcı</option>
-                </select>
-                <br>
 
-                <label style="display: block;margin-bottom: 10px">Fiş Üzerindeki Değişkenler</label>
-                <label style="display: block;margin: 0;">[SNO]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Servis no çıkartır.</span>
+<div class="d-flex justify-content-center w-100">
+    <form id="yaziciFisTasarimi" method="post" action="{{ route('update.receipt.design',$firma->id)}}" enctype="multipart/form-data" class="needs-validation" novalidate>
+      @csrf
+      <input type="hidden" name="id" value="{{ $receiptDesign->id ?? '' }}">
 
-                <label style="display: block;margin: 0;">[FIRMAADI]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Firmanın kayıtlı adını çıkartır.</span>
+      <div class="d-flex flex-wrap justify-content-center gap-4 mb-3">
+        <!-- Sol Kolon - Textarea -->
+        <div style="flex: 0 0 auto;">
+          <textarea class="form-control mesaj" name="mesaj" type="text" rows="10" style="resize: none; width: 330px; height: 510px; font-family: monospace; font-size: 12px;" required>{{$receiptDesign->fisTasarimi ?? ''}}</textarea>
+        </div>
+        
+        <!-- Sağ Kolon - Değişkenler -->
+        <div style="flex: 0 0 auto; max-width: 280px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600;">Kullanmak İstediğiniz Yazıcı</label>
+          <select class="form-control yaziciBoyut" name="yaziciBoyut" style="width: 150px;">
+            <option value="58" {{ ($receiptDesign->boyut ?? null) == 58 ? 'selected' : '' }}>58mm Yazıcı</option>
+            <option value="80" {{ ($receiptDesign->boyut ?? null) == 80 ? 'selected' : '' }}>80mm Yazıcı</option>
+          </select>
+          <br>
 
-                <label style="display: block;margin: 0;">[TEL]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Firmanın kayıtlı telefonunu çıkartır.</span>
+          <label style="display: block; margin-bottom: 10px; font-weight: 600;">Fiş Üzerindeki Değişkenler</label>
+          
+          <label style="display: block; margin: 0; font-weight: 500;">[SNO]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Servis no çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[MUSTERIBILGILERI]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Müşteri bilgilerini çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[FIRMAADI]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Firmanın kayıtlı adını çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[CIHAZBILGILERI]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Cihaz bilgilerini çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[TEL]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Firmanın kayıtlı telefonunu çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[YAPILANISLEMLER]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Yapılan son 3 işlemi çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[MUSTERIBILGILERI]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Müşteri bilgilerini çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[KASAHAREKETLERI]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Para hareketlerini çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[CIHAZBILGILERI]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Cihaz bilgilerini çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[TEKNISYENADI]</label>
-                <span style="display: block;margin-bottom: 5px;font-size: 13px">Teknisyen adını çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[YAPILANISLEMLER]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Yapılan son 3 işlemi çıkartır.</span>
 
-                <label style="display: block;margin: 0;">[TARIHSAAT]</label>
-                <span style="display: block;margin-bottom: 10px;font-size: 13px">Tarih saati çıkartır.</span>
+          <label style="display: block; margin: 0; font-weight: 500;">[KASAHAREKETLERI]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Para hareketlerini çıkartır.</span>
 
-                <label style="display: block;margin: 0;color: red;cursor: pointer;font-weight: 500;" class="ornekSayfaBtn">- Örnek Sayfa -</label>
-                <br>
+          <label style="display: block; margin: 0; font-weight: 500;">[TEKNISYENADI]</label>
+          <span style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Teknisyen adını çıkartır.</span>
 
+          <label style="display: block; margin: 0; font-weight: 500;">[TARIHSAAT]</label>
+          <span style="display: block; margin-bottom: 10px; font-size: 13px; color: #666;">Tarih saati çıkartır.</span>
 
-<textarea class="ornekSayfa58" style="display:none;">
+          <label style="display: block; margin: 0; color: red; cursor: pointer; font-weight: 500;" class="ornekSayfaBtn">- Örnek Sayfa -</label>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <input type="submit" class="btn btn-info waves-effect waves-light" value="Kaydet">
+      </div>
+
+      <!-- Hidden textareas for templates -->
+      <textarea class="ornekSayfa58" style="display:none;">
 [FIRMAADI]
 TEL : [TEL]
 ADRES : [ADRES]
@@ -92,8 +103,8 @@ TARIH : [TARIHSAAT]
 
 
 ================================
-</textarea>
-<textarea class="ornekSayfa80" style="display:none;">
+      </textarea>
+      <textarea class="ornekSayfa80" style="display:none;">
 [FIRMAADI]
 TEL : [TEL]
 ADRES : [ADRES]
@@ -132,18 +143,9 @@ TARIH : [TARIHSAAT]
 
 
 ================================
-</textarea>
-            </div>
-          </div>
-          <!-- end row -->
-
-          <div class="row">
-            <label class="col-sm-4 col-form-label"></label>
-            <div class="col-sm-8">
-              <input type="submit" class="btn btn-info waves-effect waves-light" value="Kaydet">
-            </div>
-          </div>
-        </form>
+      </textarea>
+    </form>
+</div>
     
 <script>
   $(document).ready(function () {

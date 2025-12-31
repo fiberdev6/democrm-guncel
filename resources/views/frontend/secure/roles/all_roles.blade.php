@@ -22,6 +22,12 @@
             @endforeach
           </tbody>
         </table>
+
+        @if($roles->count() > 0)
+              <div class="text-muted mt-2" style="font-size: 13px;">
+                Toplam: <strong>{{ $roles->count() }}</strong> 
+              </div>
+          @endif
       </div>
 
 <!-- add modal content -->
@@ -121,5 +127,15 @@ $(document).ready(function(){
             });
         }
     });
+  });
+
+  $('#datatableRole').DataTable({
+    paging: false,
+    searching: false,
+    info: false,
+    lengthChange: false,
+    language: {
+        emptyTable: "Tabloda herhangi bir veri mevcut değil"
+    }
   });
 </script>

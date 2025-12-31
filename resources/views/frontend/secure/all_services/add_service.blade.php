@@ -658,17 +658,7 @@ $(document).ready(function () {
           // Bireysel Müşteri - TC No Kontrolü
           var tcNo = $('#tcKimlik').val().replace(/\s/g, '');
           
-          if (!tcNo || tcNo.length === 0) {
-            // TC No boş - Kullanıcıya sor
-            var confirmMessage = 'Fatura keseceğiniz bir müşteriyse TC Kimlik Numarası girmeniz önerilir.\n\n' +
-                                'TC No olmadan devam etmek istiyor musunuz?';
-            
-            if (!confirm(confirmMessage)) {
-              formIsValid = false;
-              $('#tcKimlik').focus();
-              return false;
-            }
-          } else if (tcNo.length !== 11) {
+          if (tcNo && tcNo.length > 0 && tcNo.length !== 11) {
             errorMessage = 'TC Kimlik Numarası 11 haneli olmalıdır.';
             formIsValid = false;
             $('#tcKimlik').focus();
